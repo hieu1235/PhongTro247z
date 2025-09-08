@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/services/FacebookService.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/controllers/ListingManagementServlet.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/controllers/ManualFacebookPostServlet.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/jobs/FacebookAutoPostJob.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/exceptions/DatabaseException.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/models/ActivityLog.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/dao/ActivityLogDAO.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/exceptions/FacebookAPIException.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/controllers/FacebookConfigServlet.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/models/User.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/filters/CharacterEncodingFilter.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/controllers/FacebookStatsServlet.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/web/listing-management.jsp</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/utils/SessionUtil.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/models/FacebookPostResponse.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/models/Listing.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/utils/FacebookAPIUtil.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/models/ListingImage.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/models/FacebookPostRequest.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/dao/ListingDAO.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/filters/AuthenticationFilter.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/dao/UserDAO.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/web/index.html</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/config/AppConfig.java</file>
+            <file>file:/D:/PRJ301/PhongTroNew/src/java/DBcontext/DBContext.java</file>
+        </group>
+    </open-files>
+</project-private>
