@@ -14,156 +14,175 @@
                 box-sizing: border-box;
                 font-family: 'Poppins', sans-serif;
             }
-
             body {
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                padding:20px;
             }
-
             form {
-                background: white;
-                padding: 40px;
-                border-radius: 10px;
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-                width: 100%;
-                max-width: 400px;
+                background:white;
+                padding:40px;
+                border-radius:10px;
+                box-shadow:0 15px 35px rgba(0,0,0,0.1);
+                width:100%;
+                max-width:400px;
             }
-
             h3 {
-                text-align: center;
-                color: #333;
-                margin-bottom: 30px;
-                font-size: 24px;
-                font-weight: 600;
+                text-align:center;
+                color:#333;
+                margin-bottom:30px;
+                font-size:24px;
+                font-weight:600;
             }
-
             label {
-                display: block;
-                margin-bottom: 8px;
-                color: #555;
-                font-weight: 500;
+                display:block;
+                margin-bottom:8px;
+                color:#555;
+                font-weight:500;
             }
-
             input[type="text"] {
-                width: 100%;
-                padding: 12px;
-                border: 2px solid #ddd;
-                border-radius: 8px;
-                font-size: 16px;
-                margin-bottom: 20px;
-                transition: border-color 0.3s ease;
-                text-align: center;
-                font-weight: 600;
-                letter-spacing: 2px;
+                width:100%;
+                padding:12px;
+                border:2px solid #ddd;
+                border-radius:8px;
+                font-size:16px;
+                margin-bottom:20px;
+                transition:border-color .3s;
+                text-align:center;
+                font-weight:600;
+                letter-spacing:2px;
             }
-
             input[type="text"]:focus {
-                outline: none;
-                border-color: #667eea;
+                outline:none;
+                border-color:#667eea;
             }
-
             button {
-                width: 100%;
-                padding: 12px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: transform 0.2s ease;
-                margin-bottom: 15px;
+                width:100%;
+                padding:12px;
+                background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+                color:white;
+                border:none;
+                border-radius:8px;
+                font-size:16px;
+                font-weight:600;
+                cursor:pointer;
+                transition:transform .2s;
+                margin-bottom:15px;
             }
-
             button:hover {
-                transform: translateY(-2px);
+                transform:translateY(-2px);
             }
-
             button:disabled {
-                background: #ccc;
-                cursor: not-allowed;
-                transform: none;
+                background:#ccc;
+                cursor:not-allowed;
+                transform:none;
             }
-
             #countdown {
-                text-align: center;
-                font-size: 16px;
-                color: #00ca92;
-                margin-bottom: 10px;
+                text-align:center;
+                font-size:16px;
+                color:#00ca92;
+                margin-bottom:10px;
             }
-
             h4 {
-                text-align: center;
+                text-align:center;
             }
-
             h4 a {
-                color: #667eea;
-                text-decoration: none;
-                font-weight: 500;
+                color:#667eea;
+                text-decoration:none;
+                font-weight:500;
             }
-
             h4 a:hover {
-                text-decoration: underline;
+                text-decoration:underline;
             }
         </style>
     </head>
     <body>
-        <form action="verifyCode" method="post">
+        <form action="${pageContext.request.contextPath}/verifyCode" method="post">
             <h3>Nhập mã xác nhận</h3>
+
             <label for="code">Mã xác nhận</label>
-            <input type="text" placeholder="Nhập mã 6 số" id="code" name="code" required maxlength="6">
-            <input type="hidden" name="email" value="${email}">
-            
+            <input type="text" placeholder="Nhập mã 6 số" id="code" name="code" required maxlength="6" pattern="\d{6}" inputmode="numeric" autocomplete="one-time-code">
+
+            <input type="hidden" name="email" value="<c:out value='${email}'/>">
+
             <button type="submit" id="verifyBtn">Xác nhận</button>
             <p id="countdown"></p>
-            <h4><a href="forgotPassword.jsp">Gửi lại mã</a></h4>
+
+            <h4>
+                <!-- direct user to forgot-password flow (servlet) to request a new code -->
+                <a href="${pageContext.request.contextPath}/forgotPassword">Gửi lại mã</a>
+            </h4>
         </form>
-    
+
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            var errorMsg = "${error != null ? error : ''}";
-            var successMsg = "${success != null ? success : ''}";
-            
-            if (errorMsg && errorMsg.trim() !== "") {
+
+        <!-- Server-rendered alerts (safe, escaped) -->
+        <c:if test="${not empty error}">
+            <script>
                 Swal.fire({
                     icon: 'error',
                     title: 'Lỗi',
-                    text: errorMsg
+                    text: '<c:out value="${error}" />'
                 });
-            } else if (successMsg && successMsg.trim() !== "") {
+            </script>
+        </c:if>
+
+        <c:if test="${not empty success}">
+            <script>
                 Swal.fire({
                     icon: 'success',
                     title: 'Thành công',
-                    text: successMsg
+                    text: '<c:out value="${success}" />'
                 });
-            }
+            </script>
+        </c:if>
 
-            let expiryTimestamp = ${sessionScope.resetExpiry};
-            
+        <script>
+            // Guarded expiry value from session; will only be set when attribute exists
+            var expiryTimestamp = 0;
+            <c:if test="${not empty sessionScope.resetExpiry}">
+            expiryTimestamp = <c:out value='${sessionScope.resetExpiry}'/>;
+            </c:if>
+
             function updateCountdown() {
-                const now = new Date().getTime();
-                const distance = expiryTimestamp - now;
-                
-                if (distance <= 0) {
-                    document.getElementById("countdown").innerHTML = "Mã đã hết hạn. Vui lòng gửi lại.";
-                    document.getElementById("countdown").style.color = "red";
-                    document.getElementById("verifyBtn").disabled = true;
+                const countdownEl = document.getElementById("countdown");
+                const verifyBtn = document.getElementById("verifyBtn");
+
+                if (!expiryTimestamp || isNaN(expiryTimestamp)) {
+                    countdownEl.innerHTML = "Không có thông tin phiên. Vui lòng yêu cầu mã mới.";
+                    countdownEl.style.color = "red";
+                    verifyBtn.disabled = true;
                     return;
                 }
-                
+
+                const now = Date.now();
+                const distance = expiryTimestamp - now;
+
+                if (distance <= 0) {
+                    countdownEl.innerHTML = "Mã đã hết hạn. Vui lòng gửi lại.";
+                    countdownEl.style.color = "red";
+                    verifyBtn.disabled = true;
+                    return;
+                }
+
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                document.getElementById("countdown").innerHTML = "Mã sẽ hết hạn sau: " + minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                countdownEl.innerHTML = "Mã sẽ hết hạn sau: " + minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
             }
-            
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
 
+            // initialize countdown only if expiryTimestamp set
+            if (expiryTimestamp && !isNaN(expiryTimestamp)) {
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            } else {
+                // if no expiry info, disable verify to avoid errors
+                document.getElementById("verifyBtn").disabled = true;
+            }
+
+            // Client-side validation for code format
             document.querySelector('form').addEventListener('submit', function (e) {
                 var codeInput = document.getElementById('code');
                 var code = codeInput.value.trim();

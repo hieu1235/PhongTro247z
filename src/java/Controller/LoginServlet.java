@@ -2,6 +2,7 @@ package Controller;
 
 import Dal.UserDAO;
 import Model.User;
+import Utility.PasswordUtils;
 
 import java.io.IOException;
 
@@ -19,21 +20,18 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // Xử lý logout nếu có action=logout
         String action = request.getParameter("action");
         if ("logout".equals(action)) {
             handleLogout(request, response);
             return;
         }
         
-        // Kiểm tra nếu đã đăng nhập rồi thì redirect về home
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("currentUser") != null) {
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }
         
-        // Forward đến trang login
         request.getRequestDispatcher("login.jsp").forward(request, response);
     }
     
@@ -44,7 +42,6 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         
-        // Validation
         if (username == null || username.trim().isEmpty() || 
             password == null || password.trim().isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin đăng nhập");
@@ -53,26 +50,35 @@ public class LoginServlet extends HttpServlet {
         }
         
         try {
-            // Xác thực user
             UserDAO userDAO = new UserDAO();
-            User user = userDAO.login(username.trim(), password);
+            // Lấy user theo username, sau đó verify password bằng PasswordUtils
+            User user = userDAO.getUserByUsername(username.trim());
             
-            if (user != null) {
-                // Đăng nhập thành công
-                HttpSession session = request.getSession();
-                session.setAttribute("currentUser", user);
+            if (user != null && user.getPassword() != null 
+                    && PasswordUtils.verifyPassword(password, user.getPassword())
+                    && isValidUser(user)) {
                 
-                // Ghi log
+                // Xử lý session fixation: invalidate session cũ và tạo session mới
+                HttpSession oldSession = request.getSession(false);
+                if (oldSession != null) {
+                    oldSession.invalidate();
+                }
+                HttpSession session = request.getSession(true);
+                
+                // Không lưu hash password vào session
+                user.setPassword(null);
+                session.setAttribute("currentUser", user);
+                // Tuỳ nhu cầu, cấu hình thời gian session
+                session.setMaxInactiveInterval(30 * 60); // 30 phút
+                
                 System.out.println("User logged in: " + user.getUsername() + " - Role: " + user.getRoleName());
                 
-                // Redirect theo role
                 String redirectUrl = getRedirectUrlByRole(user, request.getContextPath());
                 response.sendRedirect(redirectUrl);
                 
             } else {
-                // Đăng nhập thất bại
                 request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng");
-                request.setAttribute("username", username); // Giữ lại username
+                request.setAttribute("username", username);
                 request.getRequestDispatcher("login.jsp").forward(request, response);
             }
             
@@ -100,16 +106,35 @@ public class LoginServlet extends HttpServlet {
     }
     
     private String getRedirectUrlByRole(User user, String contextPath) {
-        // Lấy role_name từ database thông qua User object
-        String roleName = user.getRoleName();
+        if (user.getRoleName() == null) {
+            return contextPath + "/";
+        }
+        
+        String roleName = user.getRoleName().toUpperCase();
         
         switch (roleName) {
             case "ADMIN":
-                return contextPath + "/admin-dashboard.jsp";
+                return contextPath + "/admin/dashboard";
             case "LANDLORD":
-                return contextPath + "/landlord-rooms.jsp";
+                return contextPath + "/landlord/dashboard";
             default:
-                return contextPath + "/"; // Tenant hoặc role khác về trang chủ
+                return contextPath + "/";
         }
+    }
+    
+    // Kiểm tra User có hợp lệ không dựa trên model User
+    private boolean isValidUser(User user) {
+        if (user == null) {
+            return false;
+        }
+        
+        // Kiểm tra các field bắt buộc từ model User
+        if (user.getUserId() <= 0 || 
+            user.getUsername() == null || user.getUsername().trim().isEmpty() ||
+            user.getRoleId() <= 0) {
+            return false;
+        }
+        
+        return true;
     }
 }

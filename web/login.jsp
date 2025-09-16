@@ -280,6 +280,7 @@
         </style>
     </head>
     <body>
+        <!-- Server-side toast (escaped) -->
         <c:if test="${not empty sessionScope.message}">
             <div id="toastMessage" class="toast-message ${sessionScope.messageType}">
                 <c:choose>
@@ -289,27 +290,31 @@
                     <c:when test="${sessionScope.messageType == 'error'}">
                         <i class="fa fa-times-circle"></i>
                     </c:when>
+                    <c:otherwise>
+                        <i class="fa fa-info-circle"></i>
+                    </c:otherwise>
                 </c:choose>
-                ${sessionScope.message}
+                <c:out value="${sessionScope.message}" />
             </div>
 
-            <!-- Xóa message sau khi hiển thị -->
+            <!-- Remove message after render -->
             <c:remove var="message" scope="session" />
             <c:remove var="messageType" scope="session" />
         </c:if>
         
-        <form action="login" method="post">
+        <form action="${pageContext.request.contextPath}/login" method="post">
             <h3>Đăng nhập hệ thống</h3>
             
             <label for="username">Tên đăng nhập</label>
             <input type="text" placeholder="Nhập tên đăng nhập" id="username" name="username" 
-                   value="${param.username}" required>
+                   value="<c:out value='${param.username}'/>" required>
 
             <label for="password">Mật khẩu</label>
             <input type="password" placeholder="Nhập mật khẩu" id="password" name="password" required> 
 
             <div class="forgot-password">
-                <a href="${pageContext.request.contextPath}/forgotPassword.jsp">Quên mật khẩu?</a>
+                <!-- Link to servlet path (not direct JSP) so rate-limit and logic run server-side -->
+                <a href="${pageContext.request.contextPath}/forgotPassword">Quên mật khẩu?</a>
             </div>
 
             <button type="submit" id="login">
@@ -322,27 +327,31 @@
                 </a>
             </div>
             
-            <h4>Chưa có tài khoản? <a href="${pageContext.request.contextPath}/register.jsp">Đăng ký ngay</a></h4>
+            <h4>Chưa có tài khoản? <a href="${pageContext.request.contextPath}/register">Đăng ký ngay</a></h4>
         </form>
 
         <script src="${pageContext.request.contextPath}/js/toastMessage.js"></script>  
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            var errorMsg = "${error != null ? error : ''}";
-            var successMsg = "${success != null ? success : ''}";
-            if (errorMsg && errorMsg.trim() !== "") {
+
+        <!-- Server-rendered SweetAlert calls (escaped) for request-scoped messages -->
+        <c:if test="${not empty error}">
+            <script>
                 Swal.fire({
                     icon: 'error',
                     title: 'Lỗi',
-                    text: errorMsg
+                    text: '<c:out value="${error}" />'
                 });
-            } else if (successMsg && successMsg.trim() !== "") {
+            </script>
+        </c:if>
+
+        <c:if test="${not empty success}">
+            <script>
                 Swal.fire({
                     icon: 'success',
                     title: 'Thành công',
-                    text: successMsg
+                    text: '<c:out value="${success}" />'
                 });
-            }
-        </script>
+            </script>
+        </c:if>
     </body>
 </html>
