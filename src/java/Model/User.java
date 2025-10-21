@@ -14,6 +14,19 @@ public class User {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     
+    // Verification fields
+    private boolean isVerified = false;
+    private String verificationCode;
+    private String resetToken;
+    private Timestamp resetTokenExpires;
+    
+    // Coin system fields
+    private int coins = 0;
+    
+    // Pro system fields
+    private boolean isPro = false;
+    private Timestamp proExpiresAt;
+    
     // Constructors
     public User() {}
     
@@ -92,6 +105,46 @@ public class User {
         this.roleName = roleName;
     }
     
+    public boolean isVerified() {
+        return isVerified;
+    }
+    
+    public void setVerified(boolean verified) {
+        isVerified = verified;
+    }
+    
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+    
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+    
+    public String getResetToken() {
+        return resetToken;
+    }
+    
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+    
+    public Timestamp getResetTokenExpires() {
+        return resetTokenExpires;
+    }
+    
+    public void setResetTokenExpires(Timestamp resetTokenExpires) {
+        this.resetTokenExpires = resetTokenExpires;
+    }
+    
+    public int getCoins() {
+        return coins;
+    }
+    
+    public void setCoins(int coins) {
+        this.coins = coins;
+    }
+    
     public Timestamp getCreatedAt() {
         return createdAt;
     }
@@ -106,6 +159,51 @@ public class User {
     
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    // Pro system getters and setters
+    public boolean isPro() {
+        return isPro;
+    }
+    
+    public void setPro(boolean isPro) {
+        this.isPro = isPro;
+    }
+    
+    /**
+     * Alias method for JSP compatibility
+     */
+    public boolean getIsPro() {
+        return isPro;
+    }
+    
+    public Timestamp getProExpiresAt() {
+        return proExpiresAt;
+    }
+    
+    public void setProExpiresAt(Timestamp proExpiresAt) {
+        this.proExpiresAt = proExpiresAt;
+    }
+    
+    /**
+     * Kiểm tra Pro status có còn hiệu lực không
+     */
+    public boolean isProActive() {
+        if (!isPro || proExpiresAt == null) {
+            return false;
+        }
+        return proExpiresAt.after(new Timestamp(System.currentTimeMillis()));
+    }
+    
+    /**
+     * Lấy số ngày còn lại của gói Pro
+     */
+    public long getProDaysRemaining() {
+        if (!isProActive()) {
+            return 0;
+        }
+        long diffMs = proExpiresAt.getTime() - System.currentTimeMillis();
+        return Math.max(0, diffMs / (24 * 60 * 60 * 1000));
     }
     
     @Override

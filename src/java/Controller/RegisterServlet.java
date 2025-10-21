@@ -78,27 +78,30 @@ public class RegisterServlet extends HttpServlet {
             String verificationCode = String.format("%0" + CODE_LENGTH + "d", codeInt);
             long expiryTime = System.currentTimeMillis() + EXPIRY_MINUTES * 60_000L;
 
-            // Hash password trước khi lưu tạm vào session (KHÔNG lưu plaintext)
+            // Hash password và tạo tài khoản trực tiếp
             String hashedPassword = PasswordUtils.hashPassword(password);
 
-            // Lưu thông tin vào session để xác thực email - phù hợp với model User
-            session.setAttribute("regEmail", email.trim().toLowerCase());
-            session.setAttribute("regUsername", username.trim());
-            // lưu hashed password (không lưu raw password)
-            session.setAttribute("regPasswordHash", hashedPassword);
-            session.removeAttribute("regPassword"); // đảm bảo không còn plaintext
-            session.setAttribute("regPhone", phone.trim());
-            session.setAttribute("regFullName", fullName.trim());
-            session.setAttribute("regRoleId", 2);
-            session.setAttribute("regVerificationCode", verificationCode);
-            session.setAttribute("regExpiryTime", expiryTime);
+            // Tạo tài khoản trực tiếp không cần xác thực email
+            User newUser = new User();
+            newUser.setUsername(username.trim());
+            newUser.setPassword(hashedPassword);
+            newUser.setFullName(fullName.trim());
+            newUser.setEmail(email.trim().toLowerCase());
+            newUser.setPhone(phone.trim());
+            newUser.setRoleId(2); // 2 = LANDLORD
 
-            // Gửi email xác nhận
-            String subject = "Mã xác nhận đăng ký tài khoản - PhongTro247";
-            EmailUtility.sendRegistrationVerificationEmail(email.trim(), subject, verificationCode);
-
-            // Chuyển đến trang xác nhận email
-            response.sendRedirect(request.getContextPath() + "/verifyemail");
+            boolean registered = userDAO.addUser(newUser);
+            
+            if (registered) {
+                // Set success message và redirect to login
+                session.setAttribute("message", "Đăng ký thành công! Bạn có thể đăng nhập ngay.");
+                session.setAttribute("messageType", "success");
+                response.sendRedirect(request.getContextPath() + "/login");
+            } else {
+                request.setAttribute("error", "Có lỗi xảy ra khi tạo tài khoản. Vui lòng thử lại");
+                setFormData(request, email, username, phone, fullName);
+                request.getRequestDispatcher("register.jsp").forward(request, response);
+            }
 
         } catch (Exception e) {
             System.out.println("Error during registration: " + e.getMessage());

@@ -17,7 +17,8 @@ public class UserDAO {
      */
     public User login(String username, String password) {
         String sql = "SELECT u.user_id, u.username, u.password, u.full_name, u.email, " +
-                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at " +
+                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at, " +
+                "u.is_pro, u.pro_expires_at, u.is_verified, u.coins " +
                 "FROM users u " +
                 "INNER JOIN roles r ON u.role_id = r.role_id " +
                 "WHERE u.username = ?";
@@ -41,6 +42,10 @@ public class UserDAO {
                         user.setRoleName(rs.getString("role_name"));
                         user.setCreatedAt(rs.getTimestamp("created_at"));
                         user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                        user.setPro(rs.getBoolean("is_pro"));
+                        user.setProExpiresAt(rs.getTimestamp("pro_expires_at"));
+                        user.setVerified(rs.getBoolean("is_verified"));
+                        user.setCoins(rs.getInt("coins"));
                         return user;
                     }
                 }
@@ -128,7 +133,8 @@ public class UserDAO {
      */
     public User getUserByEmail(String email) {
         String sql = "SELECT u.user_id, u.username, u.password, u.full_name, u.email, " +
-                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at " +
+                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at, " +
+                "u.is_pro, u.pro_expires_at, u.is_verified, u.coins " +
                 "FROM users u " +
                 "INNER JOIN roles r ON u.role_id = r.role_id " +
                 "WHERE u.email = ?";
@@ -149,6 +155,10 @@ public class UserDAO {
                     user.setRoleName(rs.getString("role_name"));
                     user.setCreatedAt(rs.getTimestamp("created_at"));
                     user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    user.setPro(rs.getBoolean("is_pro"));
+                    user.setProExpiresAt(rs.getTimestamp("pro_expires_at"));
+                    user.setVerified(rs.getBoolean("is_verified"));
+                    user.setCoins(rs.getInt("coins"));
                     return user;
                 }
             }
@@ -185,7 +195,8 @@ public class UserDAO {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT u.user_id, u.username, u.password, u.full_name, u.email, " +
-                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at " +
+                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at, " +
+                "u.is_pro, u.pro_expires_at, u.is_verified, u.coins " +
                 "FROM users u " +
                 "INNER JOIN roles r ON u.role_id = r.role_id " +
                 "ORDER BY u.created_at DESC";
@@ -205,31 +216,18 @@ public class UserDAO {
                 user.setRoleName(rs.getString("role_name"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
                 user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                user.setPro(rs.getBoolean("is_pro"));
+                user.setProExpiresAt(rs.getTimestamp("pro_expires_at"));
+                user.setVerified(rs.getBoolean("is_verified")); // Đọc từ database
+                user.setCoins(rs.getInt("coins"));
                 users.add(user);
             }
         } catch (SQLException e) {
             System.out.println("Error getting all users: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return users;
-    }
-
-    /**
-     * Xóa user theo ID
-     */
-    public boolean deleteUser(int userId) {
-        String sql = "DELETE FROM users WHERE user_id = ?";
-
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            System.out.println("Error deleting user: " + e.getMessage());
-            return false;
-        }
     }
 
     /**
@@ -237,7 +235,8 @@ public class UserDAO {
      */
     public User getUserByUsername(String username) {
         String sql = "SELECT u.user_id, u.username, u.password, u.full_name, u.email, " +
-                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at " +
+                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at, " +
+                "u.is_pro, u.pro_expires_at, u.is_verified, u.coins " +
                 "FROM users u " +
                 "INNER JOIN roles r ON u.role_id = r.role_id " +
                 "WHERE u.username = ?";
@@ -259,6 +258,10 @@ public class UserDAO {
                     user.setRoleName(rs.getString("role_name"));
                     user.setCreatedAt(rs.getTimestamp("created_at"));
                     user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    user.setPro(rs.getBoolean("is_pro"));
+                    user.setProExpiresAt(rs.getTimestamp("pro_expires_at"));
+                    user.setVerified(rs.getBoolean("is_verified"));
+                    user.setCoins(rs.getInt("coins"));
                     return user;
                 }
             }
@@ -268,5 +271,239 @@ public class UserDAO {
         }
 
         return null;
+    }
+    
+    /**
+     * Lấy user theo ID
+     * @param userId
+     * @return User object hoặc null nếu không tìm thấy
+     */
+    public User getUserById(int userId) {
+        String sql = "SELECT u.user_id, u.username, u.password, u.full_name, u.email, " +
+                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at, " +
+                "u.is_pro, u.pro_expires_at, u.is_verified, u.coins " +
+                "FROM users u " +
+                "INNER JOIN roles r ON u.role_id = r.role_id " +
+                "WHERE u.user_id = ?";
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setRoleId(rs.getInt("role_id"));
+                    user.setRoleName(rs.getString("role_name"));
+                    user.setCreatedAt(rs.getTimestamp("created_at"));
+                    user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    user.setPro(rs.getBoolean("is_pro"));
+                    user.setProExpiresAt(rs.getTimestamp("pro_expires_at"));
+                    user.setVerified(rs.getBoolean("is_verified"));
+                    user.setCoins(rs.getInt("coins"));
+                    return user;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting user by ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    
+    /**
+     * Cập nhật mật khẩu của user
+     * @param userId
+     * @param hashedPassword
+     * @return true nếu thành công
+     */
+    public boolean updateUserPassword(int userId, String hashedPassword) {
+        String sql = "UPDATE users SET password = ?, updated_at = GETDATE() WHERE user_id = ?";
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, hashedPassword);
+            ps.setInt(2, userId);
+
+            int result = ps.executeUpdate();
+            System.out.println("UserDAO.updateUserPassword: Updated password for user " + userId);
+            return result > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error updating user password: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Lấy tất cả users với phân trang và filter
+     */
+    public List<User> getAllUsers(int page, int limit, String role) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT u.user_id, u.username, u.password, u.full_name, u.email, " +
+                "u.phone, u.role_id, r.role_name, u.created_at, u.updated_at, " +
+                "u.is_pro, u.pro_expires_at, u.is_verified, u.coins " +
+                "FROM users u " +
+                "INNER JOIN roles r ON u.role_id = r.role_id ";
+        
+        if (role != null && !role.isEmpty() && !"all".equals(role)) {
+            sql += "WHERE r.role_name = ? ";
+        }
+        
+        sql += "ORDER BY u.created_at DESC ";
+        sql += "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            int paramIndex = 1;
+            if (role != null && !role.isEmpty() && !"all".equals(role)) {
+                ps.setString(paramIndex++, role);
+            }
+            ps.setInt(paramIndex++, (page - 1) * limit);
+            ps.setInt(paramIndex, limit);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setRoleId(rs.getInt("role_id"));
+                    user.setRoleName(rs.getString("role_name"));
+                    user.setCreatedAt(rs.getTimestamp("created_at"));
+                    user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    user.setPro(rs.getBoolean("is_pro"));
+                    user.setProExpiresAt(rs.getTimestamp("pro_expires_at"));
+                    user.setVerified(rs.getBoolean("is_verified")); // Đọc từ database
+                    user.setCoins(rs.getInt("coins"));
+                    users.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting users with pagination: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return users;
+    }
+    
+    /**
+     * Đếm số users theo role
+     */
+    public int countUsers(String role) {
+        String sql = "SELECT COUNT(*) FROM users u INNER JOIN roles r ON u.role_id = r.role_id ";
+        
+        if (role != null && !role.isEmpty() && !"all".equals(role)) {
+            sql += "WHERE r.role_name = ?";
+        }
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            if (role != null && !role.isEmpty() && !"all".equals(role)) {
+                ps.setString(1, role);
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error counting users: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * Cập nhật thông tin user
+     */
+    public boolean updateUserProfile(int userId, String fullName, String email, String phone) {
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, updated_at = GETDATE() WHERE user_id = ?";
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, phone);
+            ps.setInt(4, userId);
+
+            int result = ps.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error updating user profile: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Bật/tắt trạng thái Pro của user
+     */
+    public boolean toggleProStatus(int userId) {
+        String sql = "UPDATE users SET is_pro = CASE WHEN is_pro = 1 THEN 0 ELSE 1 END, " +
+                    "pro_expires_at = CASE WHEN is_pro = 1 THEN NULL ELSE DATEADD(month, 1, GETDATE()) END, " +
+                    "updated_at = GETDATE() WHERE user_id = ?";
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            int result = ps.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error toggling pro status: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Xóa user (không xóa admin)
+     */
+    public boolean deleteUser(int userId) {
+        // Kiểm tra không được xóa admin
+        String checkSql = "SELECT r.role_name FROM users u INNER JOIN roles r ON u.role_id = r.role_id WHERE u.user_id = ?";
+        String deleteSql = "DELETE FROM users WHERE user_id = ? AND user_id NOT IN (SELECT user_id FROM users u INNER JOIN roles r ON u.role_id = r.role_id WHERE r.role_name = 'ADMIN')";
+
+        try (Connection conn = DBContext.getConnection()) {
+            // Check if user is admin
+            try (PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+                checkPs.setInt(1, userId);
+                try (ResultSet rs = checkPs.executeQuery()) {
+                    if (rs.next() && "ADMIN".equals(rs.getString("role_name"))) {
+                        System.out.println("Cannot delete admin user");
+                        return false;
+                    }
+                }
+            }
+            
+            // Delete user
+            try (PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
+                deletePs.setInt(1, userId);
+                int result = deletePs.executeUpdate();
+                return result > 0;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error deleting user: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }
