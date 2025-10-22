@@ -74,18 +74,13 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.payOS</groupId>
+            <groupId>com.payos</groupId>
             <artifactId>payos-java</artifactId>
             <version>1.0.3</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/payos-java-1.0.3.jar</systemPath>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
 
     <build>
         <finalName>ROOT</finalName>
@@ -94,6 +89,17 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${project.basedir}/lib</directory>
+                            <targetPath>WEB-INF/lib</targetPath>
+                            <includes>
+                                <include>**/*.jar</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
             </plugin>
         </plugins>
     </build>
