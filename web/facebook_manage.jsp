@@ -7,22 +7,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Quản lý Facebook Pages - PhongTro247</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
         <style>
-            :root{
-                --sidebar-width:240px;
-                --primary:#007bff;
-                --success:#28a745;
-                --warning:#ffc107;
-                --danger:#dc3545;
-                --light:#f8f9fa;
-                --dark:#343a40;
-                --gold:#FFD700;
-                --radius:12px;
-                --transition:all 0.3s ease;
-                --shadow:0 4px 15px rgba(0,0,0,0.1);
-                --shadow-hover:0 8px 25px rgba(0,0,0,0.15)
-            }
+            :root{--sidebar-width:230px;--primary:#007bff;--success:#28a745;--warning:#ffc107;--danger:#dc3545;--light:#f8f9fa;--dark:#343a40;--gold:#f39c12;--radius:8px;--transition:all 0.3s ease}
             *{
                 margin:0;
                 padding:0;
@@ -39,88 +27,18 @@
             }
 
             /* Sidebar */
-            .sidebar{
-                width:var(--sidebar-width);
-                background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-                color:white;
-                position:fixed;
-                height:100vh;
-                left:0;
-                top:0;
-                transition:var(--transition);
-                z-index:1000;
-                overflow-y:auto;
-                box-shadow:4px 0 15px rgba(0,0,0,0.1)
-            }
-            .sidebar.collapsed{
-                margin-left:calc(-1 * var(--sidebar-width))
-            }
-            .sidebar-header{
-                padding:25px 20px;
-                border-bottom:1px solid rgba(255,255,255,0.2);
-                background:rgba(0,0,0,0.1)
-            }
-            .user-info{
-                display:flex;
-                align-items:center;
-                gap:15px
-            }
-            .user-avatar{
-                width:55px;
-                height:55px;
-                border-radius:50%;
-                background:rgba(255,255,255,0.2);
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                font-size:26px;
-                border:2px solid rgba(255,255,255,0.3)
-            }
-            .user-details h5{
-                margin:0 0 5px 0;
-                font-size:17px;
-                font-weight:600
-            }
-            .user-details small{
-                opacity:0.8;
-                font-size:13px
-            }
-
-            .sidebar-menu{
-                padding:25px 0
-            }
-            .sidebar-menu ul{
-                list-style:none
-            }
-            .sidebar-menu a{
-                color:rgba(255,255,255,0.9);
-                padding:15px 25px;
-                display:flex;
-                align-items:center;
-                gap:15px;
-                text-decoration:none;
-                transition:var(--transition);
-                font-weight:500;
-                border-left:3px solid transparent
-            }
-            .sidebar-menu a:hover,.sidebar-menu a.active{
-                background:rgba(255,255,255,0.15);
-                color:white;
-                border-left-color:var(--gold);
-                transform:translateX(8px)
-            }
-            .sidebar-menu i{
-                width:22px;
-                text-align:center;
-                font-size:16px
-            }
-            .logout{
-                margin-top:auto;
-                border-top:1px solid rgba(255,255,255,0.2);
-                padding-top:20px
-            }
-
-            /* Main Content */
+            .sidebar{width:var(--sidebar-width);background:linear-gradient(135deg,#667eea,#764ba2);color:white;position:fixed;height:100vh;left:0;top:0;transition:var(--transition);z-index:1000;overflow-y:auto}
+            .sidebar.collapsed{margin-left:calc(-1 * var(--sidebar-width))}
+            .sidebar-header{padding:20px;border-bottom:1px solid rgba(255,255,255,0.2)}
+            .user-info{display:flex;align-items:center;gap:12px}
+            .user-avatar{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:24px}
+            .user-details h5{margin:0;font-size:16px;font-weight:600}
+            .user-details small{opacity:0.8}
+            
+        .sidebar-menu{padding:20px 0}
+        .sidebar-menu a{color:rgba(255,255,255,0.9);padding:12px 20px;display:flex;align-items:center;gap:12px;text-decoration:none;transition:var(--transition)}
+        .sidebar-menu a:hover,.sidebar-menu a.active{background:rgba(255,255,255,0.1);color:white;transform:translateX(5px)}
+        .sidebar-menu i{width:20px;text-align:center}            /* Main Content */
             .main-content{
                 flex:1;
                 margin-left:var(--sidebar-width);
@@ -130,29 +48,9 @@
                 margin-left:0
             }
 
-            /* Top Navigation */
-            .top-nav{
-                background:white;
-                padding:20px 25px;
-                box-shadow:var(--shadow);
-                display:flex;
-                align-items:center;
-                justify-content:space-between;
-                border-bottom:1px solid rgba(0,0,0,0.05)
-            }
-            .sidebar-toggle{
-                background:white;
-                border:2px solid #e9ecef;
-                border-radius:8px;
-                padding:12px 15px;
-                cursor:pointer;
-                transition:var(--transition);
-                color:var(--dark)
-            }
-            .sidebar-toggle:hover{
-                background:var(--light);
-                border-color:var(--primary)
-            }
+            /* Header */
+            .top-nav{background:white;padding:15px 20px;box-shadow:0 2px 4px rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:space-between}
+            .sidebar-toggle{background:white;border:1px solid #dee2e6;border-radius:4px;padding:8px 12px;cursor:pointer}
             .top-nav h1{
                 font-size:28px;
                 font-weight:700;
@@ -186,60 +84,14 @@
             }
 
             /* Content */
-            .content{
-                padding:30px;
-                animation:fadeIn 0.5s ease
-            }
+            .content{padding:20px}
 
-            /* Alert Messages */
-            .alert {
-                padding: 1rem 1.25rem;
-                margin-bottom: 1.5rem;
-                border: 1px solid transparent;
-                border-radius: var(--radius);
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                position: relative;
-            }
-
-            .alert-danger {
-                color: #721c24;
-                background-color: #f8d7da;
-                border-color: #f5c6cb;
-            }
-
-            .alert-success {
-                color: #155724;
-                background-color: #d4edda;
-                border-color: #c3e6cb;
-            }
-
-            .alert-dismissible {
-                padding-right: 3rem;
-            }
-
-            .btn-close {
-                position: absolute;
-                top: 0.5rem;
-                right: 0.5rem;
-                background: none;
-                border: none;
-                font-size: 1.25rem;
-                font-weight: 700;
-                line-height: 1;
-                color: #000;
-                opacity: 0.5;
-                cursor: pointer;
-            }
-
-            .btn-close:hover {
-                opacity: 0.75;
-            }
-
-            .btn-close::before {
-                content: "×";
-            }
+        /* Alerts */
+        .alert{padding:12px 16px;border-radius:var(--radius);margin-bottom:20px;display:flex;align-items:center;gap:10px;position:relative}
+        .alert-success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+        .alert-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+        .alert-close{position:absolute;right:10px;background:none;border:none;font-size:18px;cursor:pointer;opacity:0.5}
+        .alert-close:hover{opacity:1}
 
             /* Card Styles */
             .card{
@@ -487,41 +339,16 @@
             }
 
             /* Animation */
-            @keyframes fadeIn{
-                from{
-                    opacity:0;
-                    transform:translateY(30px)
-                }
-                to{
-                    opacity:1;
-                    transform:translateY(0)
-                }
-            }
+            @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 
             /* Responsive */
             @media (max-width:768px){
-                .sidebar{
-                    margin-left:calc(-1 * var(--sidebar-width))
-                }
-                .sidebar.show{
-                    margin-left:0
-                }
-                .main-content{
-                    margin-left:0
-                }
-                .col-md-6{
-                    flex:0 0 100%;
-                    max-width:100%
-                }
-                .top-nav{
-                    padding:0 15px
-                }
-                .content{
-                    padding:15px
-                }
-                .btn-group{
-                    flex-direction:column
-                }
+                .sidebar{margin-left:calc(-1 * var(--sidebar-width))}
+                .sidebar.show{margin-left:0}
+                .main-content{margin-left:0}
+                .profile-container{grid-template-columns:1fr;gap:15px}
+                .form-row{grid-template-columns:1fr}
+                .content{padding:10px}
             }
 
             /* Code styling */
@@ -549,15 +376,14 @@
                 </div>
 
                 <div class="sidebar-menu">
-                    <ul>
-                        <li><a href="${pageContext.request.contextPath}/post/my"><i class="fas fa-list-alt"></i><span>Danh sách tin đăng</span></a></li>
-                        <li><a href="${pageContext.request.contextPath}/post/create"><i class="fas fa-plus-circle"></i><span>Đăng tin mới</span></a></li>
-                        <li><a href="${pageContext.request.contextPath}/subscription"><i class="fas fa-crown"></i><span>Gói Pro</span></a></li>
-                        <li><a class="active" href="${pageContext.request.contextPath}/facebook/manage"><i class="fab fa-facebook"></i><span>Cấu hình Facebook</span></a></li>
-                        <li><a href="${pageContext.request.contextPath}/"><i class="fas fa-home"></i><span>Xem trang chủ</span></a></li>
-                        <li><a href="${pageContext.request.contextPath}/profile"><i class="fas fa-user-cog"></i><span>Cài đặt tài khoản</span></a></li>
-                        <li class="logout"><a href="${pageContext.request.contextPath}/login?action=logout" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a></li>
-                    </ul>
+                    <a href="${pageContext.request.contextPath}/post/my"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+                    <a href="${pageContext.request.contextPath}/post/my"><i class="fas fa-list-alt"></i><span>Danh sách tin đăng</span></a>
+                    <a href="${pageContext.request.contextPath}/post/create"><i class="fas fa-plus-circle"></i><span>Đăng tin mới</span></a>
+                    <a href="${pageContext.request.contextPath}/subscription"><i class="fas fa-crown"></i><span>Gói Pro</span></a>
+                    <a class="active" href="${pageContext.request.contextPath}/facebook/manage"><i class="fab fa-facebook"></i><span>Cấu hình Facebook</span></a>
+                    <a href="${pageContext.request.contextPath}/"><i class="fas fa-home"></i><span>Xem trang chủ</span></a>
+                    <a href="${pageContext.request.contextPath}/profile"><i class="fas fa-user-cog"></i><span>Cài đặt tài khoản</span></a>
+                    <a href="/PhongTroNew/logout" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')" class="logout"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a>
                 </div>
             </nav>
 
@@ -576,16 +402,16 @@
                 <main class="content">
                     <!-- Error/Success Messages -->
                     <c:if test="${not empty error}">
-                        <div class="alert alert-danger alert-dismissible">
+                        <div class="alert alert-error">
                             <i class="fas fa-exclamation-triangle"></i> ${error}
-                            <button class="btn-close" onclick="this.parentElement.style.display = 'none'"></button>
+                            <button class="alert-close" onclick="this.parentElement.style.display='none'">&times;</button>
                         </div>
                     </c:if>
                     
                     <c:if test="${not empty success}">
-                        <div class="alert alert-success alert-dismissible">
+                        <div class="alert alert-success">
                             <i class="fas fa-check-circle"></i> ${success}
-                            <button class="btn-close" onclick="this.parentElement.style.display = 'none'"></button>
+                            <button class="alert-close" onclick="this.parentElement.style.display='none'">&times;</button>
                         </div>
                     </c:if>
                     
@@ -620,7 +446,13 @@
                                     <label for="accessToken" class="form-label">Page Access Token *</label>
                                     <textarea class="form-control" id="accessToken" name="accessToken" rows="3" required
                                               placeholder="EAAIwY6SadI8BPYLZCS47mn9..."></textarea>
-                                    <div class="form-text">Long-lived Page Access Token từ Facebook</div>
+                                    <div class="form-text">
+                                        Long-lived Page Access Token từ Facebook
+                                        <a href="https://docs.google.com/document/d/1aVIG-TAPMlIztdbuVbD0RiRxKb2TdfXDJ3b33_ioUBs/edit?tab=t.0#heading=h.rwl0ju8yqqnx" 
+                                           target="_blank" class="text-primary ms-2" style="font-size: 0.8rem;">
+                                            <i class="fas fa-external-link-alt"></i> Hướng dẫn lấy token
+                                        </a>
+                                    </div>
                                 </div>
                                 
                                 <div class="row">
@@ -747,24 +579,97 @@
             </div>
         </div>
 
+        <!-- Edit Page Modal -->
+        <div class="modal fade" id="editPageModal" tabindex="-1" aria-labelledby="editPageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editPageModalLabel">
+                            <i class="fas fa-edit"></i> Chỉnh sửa Facebook Page
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="post" action="${pageContext.request.contextPath}/facebook/manage">
+                        <input type="hidden" name="action" value="edit">
+                        <input type="hidden" name="pageId" id="editPageId">
+                        
+                        <div class="modal-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Lưu ý:</strong> Việc cập nhật Access Token sẽ thay thế token cũ. 
+                                Đảm bảo token mới còn hạn và có đủ quyền.
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="editPageName" class="form-label">Tên Page</label>
+                                <input type="text" class="form-control" id="editPageName" readonly>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="editAccessToken" class="form-label">Page Access Token Mới *</label>
+                                <textarea class="form-control" id="editAccessToken" name="accessToken" rows="4" required
+                                          placeholder="EAAIwY6SadI8BPYLZCS47mn9..."></textarea>
+                                <div class="form-text">
+                                    Nhập Page Access Token mới từ Facebook Graph API
+                                    <a href="https://docs.google.com/document/d/1aVIG-TAPMlIztdbuVbD0RiRxKb2TdfXDJ3b33_ioUBs/edit?tab=t.0#heading=h.rwl0ju8yqqnx" 
+                                       target="_blank" class="text-primary ms-2" style="font-size: 0.8rem;">
+                                        <i class="fas fa-external-link-alt"></i> Hướng dẫn lấy token
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editAutoPost" name="autoPost" checked>
+                                <label class="form-check-label" for="editAutoPost">
+                                    Tự động đăng bài
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times"></i> Hủy
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <script>
-            // Sidebar toggle functionality
-            document.getElementById('sidebarToggle').addEventListener('click', function() {
+            // Sidebar functionality
+            document.addEventListener('DOMContentLoaded', function() {
                 const sidebar = document.getElementById('sidebar');
+                const sidebarToggle = document.getElementById('sidebarToggle');
                 const mainContent = document.querySelector('.main-content');
                 
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
+                // Sidebar toggle
+                if (sidebarToggle) {
+                    sidebarToggle.addEventListener('click', function() {
+                        if (window.innerWidth <= 768) {
+                            sidebar.classList.toggle('show');
+                        } else {
+                            sidebar.classList.toggle('collapsed');
+                            mainContent.classList.toggle('expanded');
+                        }
+                    });
+                }
+                
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768) {
+                        sidebar.classList.remove('show');
+                    } else {
+                        sidebar.classList.remove('collapsed');
+                        mainContent.classList.remove('expanded');
+                    }
+                });
             });
 
-            // Mobile sidebar toggle
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebarToggle').addEventListener('click', function() {
-                    const sidebar = document.getElementById('sidebar');
-                    sidebar.classList.toggle('show');
-                });
-            }
-
+            // Facebook management functions
             function toggleAutoPost(pageId, enabled) {
                 const form = document.createElement('form');
                 form.method = 'POST';
@@ -813,9 +718,28 @@
             }
             
             function editPage(pageId, pageName) {
-                // Implement edit functionality
-                alert('Chức năng chỉnh sửa sẽ được triển khai sau');
+                // Điền thông tin cơ bản vào modal
+                document.getElementById('editPageId').value = pageId;
+                document.getElementById('editPageName').value = pageName;
+                
+                // Reset form
+                document.getElementById('editAccessToken').value = '';
+                document.getElementById('editAutoPost').checked = true;
+                
+                // Mở modal
+                const modal = new bootstrap.Modal(document.getElementById('editPageModal'));
+                modal.show();
             }
+
+            // Auto dismiss alerts
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    alert.style.display = 'none';
+                });
+            }, 5000);
         </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

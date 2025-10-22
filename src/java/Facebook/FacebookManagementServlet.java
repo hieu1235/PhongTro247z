@@ -65,19 +65,29 @@ public class FacebookManagementServlet extends HttpServlet {
                 case "add":
                     System.out.println("DEBUG: Handling add action");
                     handleAddPage(req, user);
-                    req.setAttribute("success", "Thêm Facebook Page thành công!");
+                    req.setAttribute("success", "Thêm Facebook Page thành công! Page sẽ được sử dụng để tự động đăng bài.");
+                    break;
+                case "edit":
+                    System.out.println("DEBUG: Handling edit action");
+                    handleEditPage(req, user);
+                    req.setAttribute("success", "Cập nhật Access Token Facebook Page thành công! Token mới sẽ được sử dụng cho các bài đăng tiếp theo.");
                     break;
                 case "update":
-                    handleUpdatePage(req, user);
+                    System.out.println("DEBUG: Handling update action");
+                    handleEditPage(req, user);
+                    req.setAttribute("success", "Cập nhật Facebook Page thành công!");
                     break;
                 case "delete":
                     handleDeletePage(req, user);
+                    req.setAttribute("success", "Xóa Facebook Page thành công!");
                     break;
                 case "toggle":
                     handleToggleAutoPost(req, user);
+                    req.setAttribute("success", "Cập nhật cài đặt tự động đăng bài thành công!");
                     break;
                 case "setDefault":
                     handleSetDefault(req, user);
+                    req.setAttribute("success", "Đặt Page mặc định thành công!");
                     break;
                 default:
                     System.out.println("DEBUG: Unknown action: " + action);
@@ -129,22 +139,29 @@ public class FacebookManagementServlet extends HttpServlet {
         System.out.println("DEBUG: saveOrUpdate completed successfully");
     }
     
-    private void handleUpdatePage(HttpServletRequest req, User user) throws Exception {
+    private void handleEditPage(HttpServletRequest req, User user) throws Exception {
         String pageId = req.getParameter("pageId");
-        String pageName = req.getParameter("pageName");
         String accessToken = req.getParameter("accessToken");
         boolean autoPost = "on".equals(req.getParameter("autoPost"));
+        
+        System.out.println("DEBUG: Editing page " + pageId + " for user " + user.getUserId());
+        
+        if (pageId == null || pageId.trim().isEmpty() ||
+            accessToken == null || accessToken.trim().isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng điền đầy đủ thông tin");
+        }
         
         FacebookSettings existing = fbSettingsDAO.getPageById(user.getUserId(), pageId);
         if (existing == null) {
             throw new IllegalArgumentException("Page không tồn tại");
         }
         
-        existing.setPageName(pageName);
-        existing.setAccessToken(accessToken);
+        // Chỉ cập nhật access token và auto post
+        existing.setAccessToken(accessToken.trim());
         existing.setAutoPost(autoPost);
         
         fbSettingsDAO.update(existing);
+        System.out.println("DEBUG: Page updated successfully");
     }
     
     private void handleDeletePage(HttpServletRequest req, User user) throws Exception {
