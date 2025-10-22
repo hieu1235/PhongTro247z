@@ -1,0 +1,44 @@
+# Compiled class files
+*.class
+/build/
+dist/
+target/
+
+# NetBeans specific
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# Environment variables - NEVER COMMIT!
+.env
+.env.local
+.env.production
+
+# Database backup files
+*.sql.backup
+*.bak
+
+# Log files
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
+
+# Security sensitive files
+secrets/
+credentials/
+keys/

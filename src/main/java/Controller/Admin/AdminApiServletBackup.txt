@@ -1,0 +1,501 @@
+<%@page contentType="application/json" pageEncoding="UTF-8"%>
+<%@page import="Controller.Admin.AdminController"%>
+<%@page import="Model.User"%>
+<%@page import="Model.Post"%>
+<%@page import="java.util.Map"%>
+<%@page import="java.util.List"%>
+<%@page import="java.sql.SQLExce                out.print(json.toString());
+            } catch (Exception e) {
+                out.print("{\"success\": false, \"message\": \"Payment stats error: " + escapeJson(e.getMessage()) + "\"}");
+            }
+            
+        } else if ("deleteUser".equals(action)) {!
+    // Helper function để escape JSON strings
+    private String escapeJson(String str) {
+        if (str == null) return "";
+        return str.replace("\"", "\\\"")
+                  .replace("\\", "\\\\")
+                  .replace("\n", "\\n")
+                  .replace("\r", "\\r")
+                  .replace("\t", "\\t");
+    }
+%>
+
+<%
+    // Kiểm tra quyền admin
+    User currentUser = (User) session.getAttribute("user");
+    if (currentUser == null || !"ADMIN".equals(currentUser.getRoleName())) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        out.print("{\"success\": false, \"message\": \"Không có quyền truy cập\"}");
+        return;
+    }
+    
+    String action = request.getParameter("action");
+    AdminController adminController = new AdminController();
+    
+    try {
+        if ("updatePostStatus".equals(action)) {
+            // Cập nhật trạng thái bài đăng
+            String postIdStr = request.getParameter("postId");
+            String status = request.getParameter("status");
+            
+            if (postIdStr != null && status != null) {
+                int postId = Integer.parseInt(postIdStr);
+                boolean success = false;
+                String message = "";
+                
+                if ("approve".equals(status)) {
+                    success = adminController.updatePostStatus(postId, "APPROVED");
+                    message = "Đã duyệt bài đăng";
+                } else if ("reject".equals(status)) {
+                    success = adminController.updatePostStatus(postId, "REJECTED");
+                    message = "Đã từ chối bài đăng";
+                } else if ("delete".equals(status)) {
+                    success = adminController.deletePost(postId);
+                    message = "Đã xóa bài đăng";
+                }
+                
+                out.print("{\"success\": " + success + ", \"message\": \"" + message + "\"}");
+            } else {
+                out.print("{\"success\": false, \"message\": \"Thiếu tham số\"}");
+            }
+            
+        } else if ("getStats".equals(action)) {
+            // Lấy thống kê dashboard
+            Map<String, Object> stats = adminController.getDashboardStats();
+            
+            StringBuilder json = new StringBuilder();
+            json.append("{\"success\": true, ");
+            json.append("\"totalUsers\": ").append(stats.get("totalUsers")).append(", ");
+            json.append("\"totalPosts\": ").append(stats.get("totalPosts")).append(", ");
+            json.append("\"pendingPosts\": ").append(stats.get("pendingPosts")).append(", ");
+            json.append("\"approvedPosts\": ").append(stats.get("approvedPosts")).append(", ");
+            json.append("\"rejectedPosts\": ").append(stats.get("rejectedPosts")).append(", ");
+            json.append("\"adminCount\": ").append(stats.get("adminCount")).append(", ");
+            json.append("\"landlordCount\": ").append(stats.get("landlordCount")).append(", ");
+            json.append("\"userCount\": ").append(stats.get("userCount")).append(", ");
+            json.append("\"totalRevenue\": ").append(stats.get("totalRevenue")).append(", ");
+            json.append("\"monthlyRevenue\": ").append(stats.get("monthlyRevenue"));
+            json.append("}");
+            
+            out.print(json.toString());
+            
+        } else if ("getPosts".equals(action)) {
+            // Lấy danh sách bài đăng thực từ database
+            int page = 1;
+            int limit = 20;
+            String status = request.getParameter("status");
+            
+            try {
+                String pageStr = request.getParameter("page");
+                if (pageStr != null) page = Integer.parseInt(pageStr);
+                String limitStr = request.getParameter("limit");
+                if (limitStr != null) limit = Integer.parseInt(limitStr);
+            } catch (NumberFormatException e) {}
+            
+            Map<String, Object> postsData = adminController.getPostsData(page, limit, status);
+            @SuppressWarnings("unchecked")
+            java.util.List<Model.Post> posts = (java.util.List<Model.Post>) postsData.get("posts");
+            
+            StringBuilder json = new StringBuilder();
+            json.append("{\"success\": true, ");
+            json.append("\"total\": ").append(postsData.get("total")).append(", ");
+            json.append("\"totalPages\": ").append(postsData.get("totalPages")).append(", ");
+            json.append("\"currentPage\": ").append(postsData.get("currentPage")).append(", ");
+            json.append("\"posts\": [");
+            
+            for (int i = 0; i < posts.size(); i++) {
+                if (i > 0) json.append(", ");
+                Model.Post post = posts.get(i);
+                json.append("{");
+                json.append("\"postId\": ").append(post.getPostId()).append(", ");
+                json.append("\"title\": \"").append(escapeJson(post.getTitle())).append("\", ");
+                json.append("\"address\": \"").append(escapeJson(post.getAddress())).append("\", ");
+                json.append("\"price\": ").append(post.getPrice() != null ? post.getPrice() : 0).append(", ");
+                json.append("\"statusName\": \"").append(escapeJson(post.getStatusName())).append("\", ");
+                json.append("\"userFullName\": \"").append(escapeJson(post.getUserFullName() != null ? post.getUserFullName() : "N/A")).append("\", ");
+                json.append("\"createdAt\": \"").append(post.getCreatedAt() != null ? post.getCreatedAt().toString() : "").append("\"");
+                json.append("}");
+            }
+            
+            json.append("]}");
+            out.print(json.toString());
+            
+        } else if ("getPostStats".equals(action)) {
+            // Lấy thống kê bài đăng
+            try {
+                Map<String, Object> stats = adminController.getDashboardStats();
+                
+                // Tính toán thống kê posts
+                int totalPosts = stats.get("totalPosts") != null ? (Integer) stats.get("totalPosts") : 0;
+                int pendingPosts = stats.get("pendingPosts") != null ? (Integer) stats.get("pendingPosts") : 0;
+                int approvedPosts = stats.get("approvedPosts") != null ? (Integer) stats.get("approvedPosts") : 0;
+                int rejectedPosts = stats.get("rejectedPosts") != null ? (Integer) stats.get("rejectedPosts") : 0;
+                
+                StringBuilder json = new StringBuilder();
+                json.append("{\"success\": true, ");
+                json.append("\"stats\": {");
+                json.append("\"total\": ").append(totalPosts).append(", ");
+                json.append("\"pending\": ").append(pendingPosts).append(", ");
+                json.append("\"approved\": ").append(approvedPosts).append(", ");
+                json.append("\"rejected\": ").append(rejectedPosts);
+                json.append("}}");
+                
+                out.print(json.toString());
+            } catch (SQLException e) {
+                out.print("{\"success\": false, \"message\": \"Lỗi khi lấy thống kê: " + escapeJson(e.getMessage()) + "\"}");
+            }
+            
+        } else if ("getUsers".equals(action)) {
+            // Lấy danh sách users thực từ database
+            int page = 1;
+            int limit = 20;
+            String role = request.getParameter("role");
+            
+            try {
+                String pageStr = request.getParameter("page");
+                if (pageStr != null) page = Integer.parseInt(pageStr);
+                String limitStr = request.getParameter("limit");
+                if (limitStr != null) limit = Integer.parseInt(limitStr);
+            } catch (NumberFormatException e) {}
+            
+            Map<String, Object> usersData = adminController.getUsersData(page, limit, role);
+            @SuppressWarnings("unchecked")
+            java.util.List<Model.User> users = (java.util.List<Model.User>) usersData.get("users");
+            
+            StringBuilder json = new StringBuilder();
+            json.append("{\"success\": true, ");
+            json.append("\"total\": ").append(usersData.get("total")).append(", ");
+            json.append("\"totalPages\": ").append(usersData.get("totalPages")).append(", ");
+            json.append("\"currentPage\": ").append(usersData.get("currentPage")).append(", ");
+            json.append("\"users\": [");
+            
+            for (int i = 0; i < users.size(); i++) {
+                if (i > 0) json.append(", ");
+                Model.User user = users.get(i);
+                json.append("{");
+                json.append("\"userId\": ").append(user.getUserId()).append(", ");
+                json.append("\"username\": \"").append(escapeJson(user.getUsername())).append("\", ");
+                json.append("\"fullName\": \"").append(escapeJson(user.getFullName())).append("\", ");
+                json.append("\"email\": \"").append(escapeJson(user.getEmail())).append("\", ");
+                json.append("\"phone\": \"").append(escapeJson(user.getPhone() != null ? user.getPhone() : "")).append("\", ");
+                json.append("\"roleName\": \"").append(escapeJson(user.getRoleName())).append("\", ");
+                json.append("\"isPro\": ").append(user.isPro()).append(", ");
+                json.append("\"isVerified\": ").append(user.isVerified()).append(", ");
+                json.append("\"coins\": ").append(user.getCoins()).append(", ");
+                json.append("\"createdAt\": \"").append(user.getCreatedAt() != null ? user.getCreatedAt().toString() : "").append("\"");
+                json.append("}");
+            }
+            
+            json.append("]}");
+            out.print(json.toString());
+            
+        } else if ("getUserStats".equals(action)) {
+            // Lấy thống kê users
+            try {
+                Map<String, Object> stats = adminController.getDashboardStats();
+                
+                // Nếu không có dữ liệu, tạo fake data để test
+                if (stats == null || stats.isEmpty()) {
+                    stats = new HashMap<>();
+                    stats.put("totalUsers", 0);
+                    stats.put("proUsers", 0);
+                    stats.put("verifiedUsers", 0);
+                    stats.put("totalCoins", 0);
+                }
+                
+                // Build JSON response với null checks
+                StringBuilder json = new StringBuilder();
+                json.append("{\"success\": true, ");
+                json.append("\"stats\": {");
+                json.append("\"total\": ").append(stats.get("totalUsers") != null ? stats.get("totalUsers") : 0).append(", ");
+                json.append("\"pro\": ").append(stats.get("proUsers") != null ? stats.get("proUsers") : 0).append(", ");
+                json.append("\"active\": ").append(stats.get("verifiedUsers") != null ? stats.get("verifiedUsers") : 0).append(", ");
+                json.append("\"coins\": ").append(stats.get("totalCoins") != null ? stats.get("totalCoins") : 0);
+                json.append("}}");
+                
+                out.print(json.toString());
+            } catch (SQLException e) {
+                out.print("{\"success\": false, \"message\": \"Database error: " + escapeJson(e.getMessage()) + "\"}");
+            } catch (Exception e) {
+                out.print("{\"success\": false, \"message\": \"System error: " + escapeJson(e.getMessage()) + "\"}");
+            }
+            
+        } else if ("updateUser".equals(action)) {
+            // Cập nhật thông tin user
+            String userIdStr = request.getParameter("userId");
+            String fullName = request.getParameter("fullName");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            
+            if (userIdStr != null && fullName != null && email != null) {
+                int userId = Integer.parseInt(userIdStr);
+                boolean success = adminController.updateUser(userId, fullName, email, phone);
+                String message = success ? "Đã cập nhật thông tin user" : "Lỗi khi cập nhật thông tin user";
+                out.print("{\"success\": " + success + ", \"message\": \"" + message + "\"}");
+            } else {
+                out.print("{\"success\": false, \"message\": \"Thiếu thông tin bắt buộc\"}");
+            }
+            
+        } else if ("toggleProStatus".equals(action)) {
+            // Bật/tắt trạng thái Pro của user
+            String userIdStr = request.getParameter("userId");
+            
+            if (userIdStr != null) {
+                int userId = Integer.parseInt(userIdStr);
+                boolean success = adminController.toggleUserProStatus(userId);
+                String message = success ? "Đã cập nhật trạng thái Pro" : "Lỗi khi cập nhật trạng thái Pro";
+                out.print("{\"success\": " + success + ", \"message\": \"" + message + "\"}");
+            } else {
+                out.print("{\"success\": false, \"message\": \"Thiếu User ID\"}");
+            }
+            
+        } else if ("deleteUser".equals(action)) {
+            // Xóa user
+            String userIdStr = request.getParameter("userId");
+            
+            if (userIdStr != null) {
+                int userId = Integer.parseInt(userIdStr);
+                boolean success = adminController.deleteUser(userId);
+                String message = success ? "Đã xóa user thành công" : "Lỗi khi xóa user";
+                out.print("{\"success\": " + success + ", \"message\": \"" + message + "\"}");
+            } else {
+                out.print("{\"success\": false, \"message\": \"Thiếu User ID\"}");
+            }
+            
+        } else if ("getPaymentStats".equals(action)) {
+            // Lấy thống kê thanh toán  
+            try {
+                // Fake data cho payment stats (có thể thay bằng real data từ AdminController)
+                StringBuilder json = new StringBuilder();
+                json.append("{\"success\": true, ");
+                json.append("\"stats\": {");
+                json.append("\"total\": 25, ");
+                json.append("\"success\": 20, ");
+                json.append("\"pending\": 3, ");
+                json.append("\"revenue\": 50000000");
+                json.append("}}");
+                
+                out.print(json.toString());
+            } catch (Exception e) {
+                out.print("{\"success\": false, \"message\": \"Payment stats error: " + escapeJson(e.getMessage()) + "\"}");
+            }
+            long[] monthlyRevenue = (long[]) paymentStats.get("monthlyRevenue");
+            for (int i = 0; i < monthlyRevenue.length; i++) {
+                if (i > 0) json.append(", ");
+                json.append(monthlyRevenue[i]);
+            }
+            json.append("]}");
+            
+            out.print(json.toString());
+            
+        } else if ("updatePost".equals(action)) {
+            // Handle POST updates từ admin_action_api.jsp
+            String postIdStr = request.getParameter("postId");
+            String postAction = request.getParameter("postAction");
+            String reason = request.getParameter("reason");
+            
+            if (postIdStr != null && postAction != null) {
+                int postId = Integer.parseInt(postIdStr);
+                boolean success = false;
+                String message = "";
+                
+                switch (postAction) {
+                    case "approve":
+                        success = adminController.updatePostStatus(postId, "APPROVED");
+                        message = success ? "Đã duyệt bài đăng thành công" : "Lỗi khi duyệt bài đăng";
+                        break;
+                    case "reject":
+                        success = adminController.updatePostStatus(postId, "REJECTED");
+                        message = success ? "Đã từ chối bài đăng" : "Lỗi khi từ chối bài đăng";
+                        break;
+                    case "delete":
+                        success = adminController.deletePost(postId);
+                        message = success ? "Đã xóa bài đăng thành công" : "Lỗi khi xóa bài đăng";
+                        break;
+                    default:
+                        success = false;
+                        message = "Action không hợp lệ";
+                        break;
+                }
+                
+                out.print("{\"success\": " + success + ", \"message\": \"" + escapeJson(message) + "\"}");
+            } else {
+                out.print("{\"success\": false, \"message\": \"Thiếu tham số bắt buộc\"}");
+            }
+            
+        } else if ("updateUser".equals(action)) {
+            // Handle USER updates từ admin_action_api.jsp  
+            String userIdStr = request.getParameter("userId");
+            String userAction = request.getParameter("userAction");
+            String reason = request.getParameter("reason");
+            String value = request.getParameter("value");
+            
+            if (userIdStr != null && userAction != null) {
+                int userId = Integer.parseInt(userIdStr);
+                boolean success = false;
+                String message = "";
+                
+                switch (userAction) {
+                    case "grant-pro":
+                    case "revoke-pro":
+                        success = adminController.toggleUserProStatus(userId);
+                        message = success ? "Đã cập nhật trạng thái Pro" : "Lỗi khi cập nhật Pro";
+                        break;
+                    case "add-coins":
+                        if (value != null) {
+                            try {
+                                int coins = Integer.parseInt(value);
+                                success = adminController.addCoinsToUser(userId, coins);
+                                message = success ? "Đã thêm " + coins + " xu cho user" : "Thêm xu thất bại";
+                            } catch (NumberFormatException e) {
+                                success = false;
+                                message = "Số xu không hợp lệ";
+                            }
+                        } else {
+                            success = false;
+                            message = "Thiếu số xu cần thêm";
+                        }
+                        break;
+                    case "ban":
+                        success = adminController.banUser(userId, true);
+                        message = success ? "Đã khóa tài khoản user" : "Khóa tài khoản thất bại";
+                        break;
+                    case "delete":
+                        success = adminController.deleteUser(userId);
+                        message = success ? "Đã xóa user thành công" : "Lỗi khi xóa user";
+                        break;
+                    default:
+                        success = false;
+                        message = "User action không hợp lệ";
+                        break;
+                }
+                
+                out.print("{\"success\": " + success + ", \"message\": \"" + escapeJson(message) + "\"}");
+            } else {
+                out.print("{\"success\": false, \"message\": \"Thiếu tham số bắt buộc\"}");
+            }
+            
+        } else if ("paymentDetail".equals(action)) {
+            // Handle PAYMENT detail requests
+            String paymentIdStr = request.getParameter("paymentId");
+            
+            if (paymentIdStr != null) {
+                try {
+                    int paymentId = Integer.parseInt(paymentIdStr);
+                    Map<String, Object> detail = adminController.getPaymentDetail(paymentId);
+                    if (!detail.isEmpty()) {
+                        out.print("{\"success\": true, \"data\": " + 
+                                 "{\"paymentId\": " + detail.get("paymentId") + 
+                                 ", \"username\": \"" + escapeJson(String.valueOf(detail.get("username"))) + "\"" +
+                                 ", \"email\": \"" + escapeJson(String.valueOf(detail.get("email"))) + "\"" +
+                                 ", \"amount\": " + detail.get("amount") + 
+                                 ", \"status\": \"" + escapeJson(String.valueOf(detail.get("status"))) + "\"" +
+                                 ", \"paymentMethod\": \"" + escapeJson(String.valueOf(detail.get("paymentMethod"))) + "\"" +
+                                 ", \"transactionId\": \"" + escapeJson(String.valueOf(detail.get("transactionId"))) + "\"" +
+                                 ", \"createdAt\": \"" + escapeJson(String.valueOf(detail.get("createdAt"))) + "\"}}");
+                    } else {
+                        out.print("{\"success\": false, \"message\": \"Không tìm thấy thanh toán\"}");
+                    }
+                } catch (NumberFormatException e) {
+                    out.print("{\"success\": false, \"message\": \"ID thanh toán không hợp lệ\"}");
+                }
+            } else {
+                out.print("{\"success\": false, \"message\": \"Thiếu ID thanh toán\"}");
+            }
+            
+        } else if ("paymentStatus".equals(action)) {
+            // Handle PAYMENT status check requests
+            String paymentIdStr = request.getParameter("paymentId");
+            
+            if (paymentIdStr != null) {
+                try {
+                    int paymentId = Integer.parseInt(paymentIdStr);
+                    Map<String, Object> detail = adminController.getPaymentDetail(paymentId);
+                    if (!detail.isEmpty()) {
+                        String status = String.valueOf(detail.get("status"));
+                        out.print("{\"success\": true, \"status\": \"" + escapeJson(status) + "\", \"message\": \"Trạng thái hiện tại: " + escapeJson(status) + "\"}");
+                    } else {
+                        out.print("{\"success\": false, \"message\": \"Không tìm thấy thanh toán\"}");
+                    }
+                } catch (NumberFormatException e) {
+                    out.print("{\"success\": false, \"message\": \"ID thanh toán không hợp lệ\"}");
+                }
+            } else {
+                out.print("{\"success\": false, \"message\": \"Thiếu ID thanh toán\"}");
+            }
+            
+        } else if ("getPayments".equals(action)) {
+            // Lấy danh sách payments
+            int page = 1;
+            int limit = 20;
+            
+            try {
+                String pageStr = request.getParameter("page");
+                if (pageStr != null) page = Integer.parseInt(pageStr);
+                String limitStr = request.getParameter("limit");
+                if (limitStr != null) limit = Integer.parseInt(limitStr);
+            } catch (NumberFormatException e) {}
+            
+            Map<String, Object> paymentsData = adminController.getPaymentsData(page, limit);
+            @SuppressWarnings("unchecked")
+            java.util.List<java.util.Map<String, Object>> payments = 
+                (java.util.List<java.util.Map<String, Object>>) paymentsData.get("payments");
+            
+            StringBuilder json = new StringBuilder();
+            json.append("{\"success\": true, ");
+            json.append("\"total\": ").append(paymentsData.get("total")).append(", ");
+            json.append("\"totalPages\": ").append(paymentsData.get("totalPages")).append(", ");
+            json.append("\"currentPage\": ").append(paymentsData.get("currentPage")).append(", ");
+            json.append("\"payments\": [");
+            
+            for (int i = 0; i < payments.size(); i++) {
+                if (i > 0) json.append(", ");
+                java.util.Map<String, Object> payment = payments.get(i);
+                json.append("{");
+                json.append("\"orderId\": ").append(payment.get("orderId")).append(", ");
+                json.append("\"orderCode\": \"").append(escapeJson(String.valueOf(payment.get("orderCode")))).append("\", ");
+                json.append("\"userName\": \"").append(escapeJson(String.valueOf(payment.get("userName")))).append("\", ");
+                json.append("\"amount\": ").append(payment.get("amount")).append(", ");
+                json.append("\"paymentMethod\": \"").append(escapeJson(String.valueOf(payment.get("paymentMethod")))).append("\", ");
+                json.append("\"status\": \"").append(escapeJson(String.valueOf(payment.get("status")))).append("\", ");
+                json.append("\"createdAt\": \"").append(escapeJson(String.valueOf(payment.get("createdAt")))).append("\"");
+                json.append("}");
+            }
+            
+            json.append("]}");
+            out.print(json.toString());
+            
+        } else if ("getPaymentStats".equals(action)) {
+            // Lấy thống kê payments
+            try {
+                Map<String, Object> stats = adminController.getPaymentStats();
+                
+                StringBuilder json = new StringBuilder();
+                json.append("{\"success\": true, ");
+                json.append("\"stats\": {");
+                json.append("\"total\": ").append(stats.get("totalPayments")).append(", ");
+                json.append("\"success\": ").append(stats.get("successPayments")).append(", ");
+                json.append("\"pending\": ").append(stats.get("pendingPayments")).append(", ");
+                json.append("\"revenue\": ").append(stats.get("totalRevenue"));
+                json.append("}}");
+                
+                out.print(json.toString());
+            } catch (SQLException e) {
+                out.print("{\"success\": false, \"message\": \"Lỗi khi lấy thống kê: " + escapeJson(e.getMessage()) + "\"}");
+            }
+            
+        } else {
+            out.print("{\"success\": false, \"message\": \"Action không hợp lệ\"}");
+        }
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+        out.print("{\"success\": false, \"message\": \"Lỗi database: " + e.getMessage() + "\"}");
+    } catch (NumberFormatException e) {
+        out.print("{\"success\": false, \"message\": \"Tham số không hợp lệ\"}");
+    } catch (Exception e) {
+        e.printStackTrace();
+        out.print("{\"success\": false, \"message\": \"Lỗi hệ thống: " + e.getMessage() + "\"}");
+    }
+%>
