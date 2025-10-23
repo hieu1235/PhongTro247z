@@ -16,11 +16,13 @@ public class DBContext {
         try {
             HikariConfig config = new HikariConfig();
             
-            config.setJdbcUrl(EnvConfig.getDatabaseUrl()); 
+            // ✅ ĐÂY LÀ DÒNG ĐÃ SỬA: Sử dụng phương thức buildDatabaseUrl() chính xác
+            config.setJdbcUrl(EnvConfig.buildDatabaseUrl()); 
+            
             config.setUsername(EnvConfig.getDatabaseUsername());
             config.setPassword(EnvConfig.getDatabasePassword());
-
-            // ✅ ĐÃ THAY ĐỔI: Sử dụng driver cho PostgreSQL
+            
+            // Sử dụng driver cho PostgreSQL
             config.setDriverClassName("org.postgresql.Driver");
 
             // Cấu hình Connection Pool

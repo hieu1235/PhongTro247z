@@ -26,19 +26,6 @@ public class EnvConfig {
     }
 
     /**
-     * Get database URL directly from DB_URL environment variable
-     * @return Database URL string
-     */
-    public static String getDatabaseUrl() {
-        String url = get("DB_URL");
-        if (url == null || url.isEmpty()) {
-            // Fallback to building URL from separate variables
-            return buildDatabaseUrl();
-        }
-        return url;
-    }
-
-    /**
      * Xây dựng chuỗi JDBC URL từ các biến môi trường riêng lẻ.
      * Đây là cách làm đúng chuẩn cho môi trường server.
      * @return Chuỗi JDBC URL hoàn chỉnh.
@@ -54,8 +41,8 @@ public class EnvConfig {
             throw new IllegalStateException("Database configuration is missing!");
         }
         
-        // PostgreSQL JDBC URL format
-        return "jdbc:postgresql://" + host + ":" + port + "/" + dbName + "?sslmode=require";
+        // Định dạng URL cho PostgreSQL
+        return "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
     }
 
     // ========== PAYOS CONFIGURATION ==========
