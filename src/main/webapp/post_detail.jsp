@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://jakarta.ee/tags/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://jakarta.ee/tags/functions" %>
+<%@ taglib prefix="fmt" uri="http://jakarta.ee/tags/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -879,11 +879,11 @@
             // Google Maps
             <c:if test="${not empty post.lat && not empty post.lng}">
                 function initMap() {
-                    var pos = { 
-                        lat: parseFloat('${post.lat}'), 
-                        lng: parseFloat('${post.lng}') 
+                    var pos = {
+                        lat: parseFloat('${post.lat}'),
+                        lng: parseFloat('${post.lng}')
                     };
-                    
+
                     var map = new google.maps.Map(document.getElementById('map'), {
                         center: pos,
                         zoom: 16,
@@ -905,34 +905,21 @@
                             }
                         ]
                     });
-                    
+
                     var marker = new google.maps.Marker({
                         position: pos,
                         map: map,
                         title: '${fn:escapeXml(post.title)}',
                         animation: google.maps.Animation.DROP,
                         icon: {
-                            url: 'data:image/svg+xml;base64,' + btoa(`
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#667eea"/>
-                                    <circle cx="12" cy="9" r="2.5" fill="white"/>
-                                </svg>
-                            `),
+                            url: 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#667eea"/><circle cx="12" cy="9" r="2.5" fill="white"/></svg>'),
                             scaledSize: new google.maps.Size(40, 40),
                             anchor: new google.maps.Point(20, 40)
                         }
                     });
 
                     var infoWindow = new google.maps.InfoWindow({
-                        content: `
-                            <div style="padding: 10px; max-width: 250px;">
-                                <h4 style="margin: 0 0 8px 0; color: #2d3748;">${fn:escapeXml(post.title)}</h4>
-                                <p style="margin: 0 0 8px 0; color: #718096; font-size: 14px;">${fn:escapeXml(post.address)}</p>
-                                <p style="margin: 0; font-weight: 600; color: #e53e3e; font-size: 16px;">
-                                    <fmt:formatNumber value="${post.price}" type="currency" currencySymbol="₫"/>
-                                </p>
-                            </div>
-                        `
+                        content: '<div style="padding: 10px; max-width: 250px;"><h4 style="margin: 0 0 8px 0; color: #2d3748;">${fn:escapeXml(post.title)}</h4><p style="margin: 0 0 8px 0; color: #718096; font-size: 14px;">${fn:escapeXml(post.address)}</p><p style="margin: 0; font-weight: 600; color: #e53e3e; font-size: 16px;">${post.price}₫</p></div>'
                     });
 
                     marker.addListener('click', function() {

@@ -1,5 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="c" uri="http://jakarta.ee/tags/core" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -215,7 +215,7 @@
             const expiryTime = <c:out value='${sessionScope.regExpiryTime}' />;
             const currentTime = Date.now();
             const remaining = Math.floor((expiryTime - currentTime) / 1000);
-            if (remaining > 0) {
+            if (remaining &gt; 0) {
                 startCountdown(remaining, "countdown");
             } else {
                 document.getElementById("countdown").textContent = "Mã đã hết hạn!";

@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://jakarta.ee/tags/core" prefix="c" %>
+<%@ taglib uri="http://jakarta.ee/tags/fmt" prefix="fmt" %>
+<%@ taglib uri="http://jakarta.ee/tags/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
