@@ -40,8 +40,7 @@ public class EnvConfig {
             System.err.println("FATAL ERROR: Database environment variables (DB_HOST, DB_PORT, DB_NAME) are NOT SET!");
             throw new IllegalStateException("Database configuration is missing!");
         }
-        
-        // Định dạng URL cho PostgreSQL với kết nối an toàn
+
         return "jdbc:postgresql://" + host + ":" + port + "/" + dbName + "?sslmode=require";
     }
 
