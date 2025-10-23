@@ -41,8 +41,8 @@ public class EnvConfig {
             throw new IllegalStateException("Database configuration is missing!");
         }
         
-        // Định dạng URL cho PostgreSQL
-        return "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
+        // Định dạng URL cho PostgreSQL với kết nối an toàn
+        return "jdbc:postgresql://" + host + ":" + port + "/" + dbName + "?sslmode=require";
     }
 
     // ========== PAYOS CONFIGURATION ==========
