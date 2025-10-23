@@ -1,9 +1,0 @@
-<%
-    // Ensure CSRF token exists in session
-    String csrfToken = (String) session.getAttribute("CSRF_TOKEN");
-    if (csrfToken == null) {
-        csrfToken = java.util.UUID.randomUUID().toString();
-        session.setAttribute("CSRF_TOKEN", csrfToken);
-    }
-%>
-<meta name="csrf-token" content="<%= csrfToken %>">
