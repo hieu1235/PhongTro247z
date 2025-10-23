@@ -16,8 +16,8 @@ public class DBContext {
         try {
             HikariConfig config = new HikariConfig();
             
-            // ✅ ĐÃ SỬA: Sử dụng phương thức buildDatabaseUrl() chính xác
-            config.setJdbcUrl(EnvConfig.buildDatabaseUrl()); 
+            // ✅ SECURE: Load credentials từ environment variables
+            config.setJdbcUrl(EnvConfig.getDatabaseUrl()); 
             
             config.setUsername(EnvConfig.getDatabaseUsername());
             config.setPassword(EnvConfig.getDatabasePassword());
