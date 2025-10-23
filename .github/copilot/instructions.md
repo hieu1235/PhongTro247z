@@ -37,13 +37,13 @@ Mã nguồn phải tương thích với schema hiện tại. Lưu ý các bảng
 * **Phân quyền/Đăng nhập:** Bảng `users` và `roles`. Password trong DB đã được hash.
 * **Tin đăng:** Bảng `posts` (bao gồm `lat`, `lng`, `price`, `status_id`).
 * **Tích hợp MXH:** Bảng `facebook_settings` (chứa `access_token` và `page_id`).
-* **Kiểm duyệt:** Bảng `ai_checks` (chứa `recommendation` như 'ACCEPT', 'REJECT', 'REVIEW').
+* **Duyệt tin:** Tất cả posts được auto-approve khi tạo (status_id = 2 - APPROVED).
 
 #### 3.2. Hướng dẫn Viết Code
 
 1.  **Chức năng Bản đồ:** Khi xử lý tìm kiếm theo vị trí, code DAO phải tạo truy vấn SQL để tìm kiếm các bài đăng nằm trong bán kính/khu vực được xác định bởi các cột **`lat`** và **`lng`**.
 2.  **Đăng tin Tự động:** Code Servlet/API phải xử lý việc đọc **`access_token`** từ bảng `facebook_settings` của người dùng và gửi request POST đến Facebook Graph API.
-3.  **Kiểm duyệt:** Code Admin phải ưu tiên truy vấn các bài đăng đang ở trạng thái 'PENDING' và có kết quả AI là **'REVIEW'** từ bảng `ai_checks`.
+3.  **Auto-approve:** Tất cả posts được tự động approve khi tạo, không cần kiểm duyệt thủ công.
 4.  **Chất lượng Code:** Mã phải sạch, có chú thích Javadoc cho các lớp và phương thức công khai. Xử lý ngoại lệ (try-catch) là bắt buộc cho các thao tác DB.
 
 ---
