@@ -213,7 +213,7 @@
 
             <!-- Social Login -->
             <div class="social">
-                <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=http://localhost:8080/PhongTro247/register&response_type=code&client_id=370841450880-23fiie6auhj74f5f5lel16b2gujnt2ui.apps.googleusercontent.com&approval_prompt=force">
+                <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=https://phongtro247z.onrender.com/register&response_type=code&client_id=370841450880-23fiie6auhj74f5f5lel16b2gujnt2ui.apps.googleusercontent.com&approval_prompt=force">
                     <div class="go" style="width:100%">
                         <i class="fab fa-google"></i> Đăng ký với Google
                     </div>

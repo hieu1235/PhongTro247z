@@ -41,8 +41,8 @@ public class EnvConfig {
             throw new IllegalStateException("Database configuration is missing!");
         }
         
-        // Mẫu URL cho SQL Server, có thêm các tham số bảo mật cần thiết cho cloud.
-        return "jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dbName + ";encrypt=true;trustServerCertificate=true;";
+        // PostgreSQL JDBC URL format
+        return "jdbc:postgresql://" + host + ":" + port + "/" + dbName + "?sslmode=require";
     }
 
     // ========== PAYOS CONFIGURATION ==========

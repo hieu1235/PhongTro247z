@@ -116,7 +116,7 @@ public class EnvConfig {
     // ========== DATABASE CONFIGURATION ==========
     
     public static String getDatabaseUrl() {
-        return get("DB_URL", "jdbc:sqlserver://localhost:1433;databaseName=phongtro247_db");
+        return get("DB_URL", "jdbc:postgresql://localhost:5432/phongtro247_db");
     }
 
     public static String getDatabaseUsername() {

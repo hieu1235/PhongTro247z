@@ -16,13 +16,12 @@ public class DBContext {
         try {
             HikariConfig config = new HikariConfig();
             
-            // ✅ ĐÂY LÀ DÒNG THAY ĐỔI QUAN TRỌNG NHẤT
-            // Sử dụng phương thức mới để xây dựng URL từ các biến riêng lẻ
             config.setJdbcUrl(EnvConfig.buildDatabaseUrl()); 
-            
             config.setUsername(EnvConfig.getDatabaseUsername());
             config.setPassword(EnvConfig.getDatabasePassword());
-            config.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+            // ✅ ĐÃ THAY ĐỔI: Sử dụng driver cho PostgreSQL
+            config.setDriverClassName("org.postgresql.Driver");
 
             // Cấu hình Connection Pool
             config.setMaximumPoolSize(10);
@@ -37,7 +36,6 @@ public class DBContext {
 
         } catch (Exception e) {
             logger.severe("FATAL: Failed to initialize database connection pool: " + e.getMessage());
-            // In ra stack trace để dễ debug trên log của Render
             e.printStackTrace(); 
             throw new RuntimeException("Cannot initialize database connection pool", e);
         }

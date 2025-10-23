@@ -26,7 +26,7 @@ public class FacebookService {
     private static final String FB_GRAPH_URL = "https://graph.facebook.com/v21.0/";
     
     // ✅ Base URL config - tự động detect môi trường
-    private static final String DEFAULT_BASE_URL = "http://localhost:8080/PhongTro247";
+    private static final String DEFAULT_BASE_URL = "http://localhost:8080/PhongTroNew";
     
     /**
      * Get base URL for public image access
