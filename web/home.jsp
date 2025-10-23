@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 
 <html lang="vi">
     <head>
@@ -1774,23 +1774,21 @@
                 });
 
                 // Build markers array from server-side posts
-                var markers = [
+                var markers = [];
                 <c:forEach var="p" items="${posts}" varStatus="status">
                     <c:if test="${not empty p.lat && not empty p.lng}">
-                {
-                id: ${p.postId},
-                            title: "${fn:escapeXml(p.title)}",
+                        markers.push({
+                            id: ${p.postId},
+                            title: '${fn:escapeXml(p.title)}',
                             lat: ${p.lat},
                             lng: ${p.lng},
-                thumb: "${pageContext.request.contextPath}${p.thumbnail}",
-                            url: "${pageContext.request.contextPath}/post/detail?id=${p.postId}",
-                                    price: "${p.price}",
-                                    area: "${p.area}"
-                            }
-                            ,
+                            thumb: '${pageContext.request.contextPath}${p.thumbnail}',
+                            url: '${pageContext.request.contextPath}/post/detail?id=${p.postId}',
+                            price: '${p.price}',
+                            area: '${p.area}'
+                        });
                     </c:if>
                 </c:forEach>
-                            ];
             </script>
 
             <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
