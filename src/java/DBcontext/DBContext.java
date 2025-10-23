@@ -16,7 +16,7 @@ public class DBContext {
         try {
             HikariConfig config = new HikariConfig();
             
-            config.setJdbcUrl(EnvConfig.buildDatabaseUrl()); 
+            config.setJdbcUrl(EnvConfig.getDatabaseUrl()); 
             config.setUsername(EnvConfig.getDatabaseUsername());
             config.setPassword(EnvConfig.getDatabasePassword());
 
