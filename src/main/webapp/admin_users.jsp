@@ -1,6 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="http://jakarta.ee/tags/core" %>
-<%@taglib prefix="fmt" uri="http://jakarta.ee/tags/fmt" %>
+<%@taglib prefix="c" uri="jakarta.tags.core" %>
+<%@taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@page import="Model.User"%>
 <%@page import="Controller.Admin.AdminController"%>
 <%@page import="java.util.Map"%>
