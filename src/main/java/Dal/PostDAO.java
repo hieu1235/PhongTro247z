@@ -23,7 +23,7 @@ public class PostDAO {
      */
     public int insert(Post post, Connection conn) throws SQLException {
         String sql = "INSERT INTO posts (user_id, title, content, address, lat, lng, price, area, status_id, created_at, updated_at) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, post.getUserId());
             ps.setString(2, post.getTitle());
@@ -103,7 +103,7 @@ public class PostDAO {
                 + "LEFT JOIN post_status ps ON p.status_id = ps.status_id "
                 + "WHERE p.user_id = ? "
                 + "ORDER BY p.created_at DESC "
-                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                + "OFFSET ? LIMIT ?";
         try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ps.setInt(2, (page - 1) * pageSize);
@@ -145,7 +145,7 @@ public class PostDAO {
      * chỉ cho phép update khi user_id khớp (SQL có điều kiện user_id).
      */
     public void update(Post post, Connection conn) throws SQLException {
-        String sql = "UPDATE posts SET title = ?, content = ?, address = ?, lat = ?, lng = ?, price = ?, area = ?, updated_at = GETDATE() "
+        String sql = "UPDATE posts SET title = ?, content = ?, address = ?, lat = ?, lng = ?, price = ?, area = ?, updated_at = NOW() "
                 + "WHERE post_id = ? AND user_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, post.getTitle());
@@ -245,7 +245,7 @@ public class PostDAO {
                 + "LEFT JOIN post_status ps ON p.status_id = ps.status_id "
                 + (statusId != null ? "WHERE p.status_id = ? " : "")
                 + "ORDER BY p.created_at DESC "
-                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                + "OFFSET ? LIMIT ?";
         try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             int idx = 1;
             if (statusId != null) {
@@ -324,7 +324,7 @@ public class PostDAO {
             sql.append("AND p.area <= ? ");
             params.add(maxArea);
         }
-        sql.append("ORDER BY p.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        sql.append("ORDER BY p.created_at DESC OFFSET ? LIMIT ?");
         params.add((page - 1) * pageSize);
         params.add(pageSize);
 
@@ -475,7 +475,7 @@ public class PostDAO {
             sql.append("ORDER BY p.created_at DESC ");
         }
 
-        sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        sql.append("OFFSET ? LIMIT ?");
         params.add((page - 1) * pageSize);
         params.add(pageSize);
 
@@ -582,7 +582,7 @@ public class PostDAO {
      * Cập nhật status của post
      */
     public void updateStatus(int postId, int statusId) throws SQLException {
-        String sql = "UPDATE posts SET status_id = ?, updated_at = GETDATE() WHERE post_id = ?";
+        String sql = "UPDATE posts SET status_id = ?, updated_at = NOW() WHERE post_id = ?";
         try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, statusId);
             ps.setInt(2, postId);
@@ -594,7 +594,7 @@ public class PostDAO {
      * Cập nhật Facebook Post ID
      */
     public void updateFacebookPostId(int postId, String facebookPostId) throws SQLException {
-        String sql = "UPDATE posts SET facebook_post_id = ?, updated_at = GETDATE() WHERE post_id = ?";
+        String sql = "UPDATE posts SET facebook_post_id = ?, updated_at = NOW() WHERE post_id = ?";
         try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, facebookPostId);
             ps.setInt(2, postId);
@@ -640,7 +640,7 @@ public class PostDAO {
      * Update scheduled time for a post
      */
     public boolean updateScheduledTime(int postId, Timestamp scheduledAt) {
-        String sql = "UPDATE posts SET scheduled_at = ?, updated_at = GETDATE() WHERE post_id = ?";
+        String sql = "UPDATE posts SET scheduled_at = ?, updated_at = NOW() WHERE post_id = ?";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -662,7 +662,7 @@ public class PostDAO {
      */
     public boolean publishScheduledPost(int postId) {
         String sql = "UPDATE posts SET status_id = (SELECT status_id FROM post_status WHERE status_name = 'APPROVED'), " +
-                     "published_at = GETDATE(), updated_at = GETDATE() WHERE post_id = ? AND status_id = (SELECT status_id FROM post_status WHERE status_name = 'SCHEDULED')";
+                     "published_at = NOW(), updated_at = NOW() WHERE post_id = ? AND status_id = (SELECT status_id FROM post_status WHERE status_name = 'SCHEDULED')";
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -687,7 +687,7 @@ public class PostDAO {
                      "JOIN post_status ps ON p.status_id = ps.status_id " +
                      "JOIN users u ON p.user_id = u.user_id " +
                      "WHERE ps.status_name = 'SCHEDULED' " +
-                     "AND p.scheduled_at <= GETDATE() " +
+                     "AND p.scheduled_at <= NOW() " +
                      "ORDER BY p.scheduled_at ASC";
         
         List<Post> posts = new ArrayList<>();

@@ -77,7 +77,7 @@ public class PostImageDAO {
      */
     public String getThumbnailByPost(int postId) {
         // Ưu tiên ảnh có is_thumbnail = 1, nếu không có thì lấy ảnh đầu tiên
-        String sql = "SELECT TOP 1 image_url FROM post_images WHERE post_id = ? ORDER BY is_thumbnail DESC, image_id ASC";
+        String sql = "SELECT image_url FROM post_images WHERE post_id = ? ORDER BY is_thumbnail DESC, image_id ASC LIMIT 1";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

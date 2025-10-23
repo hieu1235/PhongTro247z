@@ -173,7 +173,7 @@ public class UserDAO {
      * Cập nhật mật khẩu
      */
     public boolean updatePassword(String email, String newPassword) {
-        String sql = "UPDATE users SET password = ?, updated_at = GETDATE() WHERE email = ?";
+        String sql = "UPDATE users SET password = ?, updated_at = NOW() WHERE email = ?";
 
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -325,7 +325,7 @@ public class UserDAO {
      * @return true nếu thành công
      */
     public boolean updateUserPassword(int userId, String hashedPassword) {
-        String sql = "UPDATE users SET password = ?, updated_at = GETDATE() WHERE user_id = ?";
+        String sql = "UPDATE users SET password = ?, updated_at = NOW() WHERE user_id = ?";
 
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -360,7 +360,7 @@ public class UserDAO {
         }
         
         sql += "ORDER BY u.created_at DESC ";
-        sql += "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        sql += "OFFSET ? LIMIT ?";
 
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -431,7 +431,7 @@ public class UserDAO {
      * Cập nhật thông tin user
      */
     public boolean updateUserProfile(int userId, String fullName, String email, String phone) {
-        String sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, updated_at = GETDATE() WHERE user_id = ?";
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, updated_at = NOW() WHERE user_id = ?";
 
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -456,8 +456,8 @@ public class UserDAO {
      */
     public boolean toggleProStatus(int userId) {
         String sql = "UPDATE users SET is_pro = CASE WHEN is_pro = 1 THEN 0 ELSE 1 END, " +
-                    "pro_expires_at = CASE WHEN is_pro = 1 THEN NULL ELSE DATEADD(month, 1, GETDATE()) END, " +
-                    "updated_at = GETDATE() WHERE user_id = ?";
+                    "pro_expires_at = CASE WHEN is_pro = 1 THEN NULL ELSE NOW() + INTERVAL '1 month' END, " +
+                    "updated_at = NOW() WHERE user_id = ?";
 
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
