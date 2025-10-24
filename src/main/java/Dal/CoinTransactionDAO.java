@@ -78,7 +78,7 @@ public class CoinTransactionDAO {
      * Lấy transactions của user (có giới hạn số lượng)
      */
     public List<CoinTransaction> getByUserId(int userId, int limit) {
-        String sql = "SELECT TOP (?) * FROM coin_transactions WHERE user_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT * FROM coin_transactions WHERE user_id = ? ORDER BY created_at DESC LIMIT ?";
         List<CoinTransaction> transactions = new ArrayList<>();
         
         try (Connection conn = DBContext.getConnection();
@@ -129,8 +129,8 @@ public class CoinTransactionDAO {
      * Lấy transactions theo loại
      */
     public List<CoinTransaction> getByUserIdAndType(int userId, String transactionType, int limit) {
-        String sql = "SELECT TOP (?) * FROM coin_transactions WHERE user_id = ? AND transaction_type = ? " +
-                    "ORDER BY created_at DESC";
+        String sql = "SELECT * FROM coin_transactions WHERE user_id = ? AND transaction_type = ? " +
+                    "ORDER BY created_at DESC LIMIT ?";
         List<CoinTransaction> transactions = new ArrayList<>();
         
         try (Connection conn = DBContext.getConnection();

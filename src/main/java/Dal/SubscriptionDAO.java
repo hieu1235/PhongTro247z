@@ -15,7 +15,7 @@ public class SubscriptionDAO {
      * Mua gói Pro cho user (30 ngày)
      */
     public boolean buyProSubscription(int userId) {
-        String sql = "UPDATE users SET is_pro = 1, pro_expires_at = DATEADD(day, 30, GETDATE()), updated_at = GETDATE() WHERE user_id = ?";
+        String sql = "UPDATE users SET is_pro = 1, pro_expires_at = NOW() + INTERVAL '30 days', updated_at = NOW() WHERE user_id = ?";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -83,8 +83,8 @@ public class SubscriptionDAO {
      * Cập nhật các user Pro đã hết hạn thành Free
      */
     public int updateExpiredProUsers() {
-        String sql = "UPDATE users SET is_pro = 0, pro_expires_at = NULL, updated_at = GETDATE() " +
-                    "WHERE is_pro = 1 AND pro_expires_at IS NOT NULL AND pro_expires_at < GETDATE()";
+        String sql = "UPDATE users SET is_pro = 0, pro_expires_at = NULL, updated_at = NOW() " +
+                    "WHERE is_pro = 1 AND pro_expires_at IS NOT NULL AND pro_expires_at < NOW()";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -106,8 +106,8 @@ public class SubscriptionDAO {
      */
     public ProStats getProStats() {
         String sql = "SELECT " +
-                    "COUNT(CASE WHEN is_pro = 1 AND pro_expires_at > GETDATE() THEN 1 END) as active_pro, " +
-                    "COUNT(CASE WHEN is_pro = 0 OR pro_expires_at <= GETDATE() THEN 1 END) as free_users, " +
+                    "COUNT(CASE WHEN is_pro = 1 AND pro_expires_at > NOW() THEN 1 END) as active_pro, " +
+                    "COUNT(CASE WHEN is_pro = 0 OR pro_expires_at <= NOW() THEN 1 END) as free_users, " +
                     "COUNT(*) as total_users " +
                     "FROM users";
         

@@ -135,7 +135,7 @@ public class FacebookSettingsDAO {
             }
             
             // Set selected page as default
-            String setSql = "UPDATE facebook_settings SET is_default = 1, updated_at = GETDATE() " +
+            String setSql = "UPDATE facebook_settings SET is_default = 1, updated_at = NOW() " +
                            "WHERE user_id = ? AND page_id = ?";
             try (PreparedStatement ps = conn.prepareStatement(setSql)) {
                 ps.setInt(1, userId);
@@ -281,7 +281,7 @@ public class FacebookSettingsDAO {
             
             // Update page
             String sql = "UPDATE facebook_settings SET page_id = ?, page_name = ?, access_token = ?, " +
-                         "is_active = ?, auto_post = ?, is_default = ?, updated_at = GETDATE() " +
+                         "is_active = ?, auto_post = ?, is_default = ?, updated_at = NOW() " +
                          "WHERE setting_id = ?";
             
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -343,7 +343,7 @@ public class FacebookSettingsDAO {
      * Toggle auto post cho một page
      */
     public void toggleAutoPost(int userId, String pageId, boolean autoPost) throws SQLException {
-        String sql = "UPDATE facebook_settings SET auto_post = ?, updated_at = GETDATE() " +
+        String sql = "UPDATE facebook_settings SET auto_post = ?, updated_at = NOW() " +
                      "WHERE user_id = ? AND page_id = ?";
         
         try (Connection conn = DBContext.getConnection();
@@ -380,8 +380,8 @@ public class FacebookSettingsDAO {
      * Helper: Lấy page active đầu tiên
      */
     private FacebookSettings getFirstActivePage(int userId) throws SQLException {
-        String sql = "SELECT TOP 1 * FROM facebook_settings WHERE user_id = ? AND is_active = 1 " +
-                    "ORDER BY created_at ASC";
+        String sql = "SELECT * FROM facebook_settings WHERE user_id = ? AND is_active = 1 " +
+                    "ORDER BY created_at ASC LIMIT 1";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

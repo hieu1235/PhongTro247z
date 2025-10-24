@@ -21,14 +21,9 @@ public class PostFacebookPageDAO {
             return;
         }
         
-        // ✅ Sử dụng MERGE để tránh duplicate key error
-        String sql = "MERGE post_facebook_pages AS target " +
-                     "USING (VALUES (?, ?, ?)) AS source (post_id, page_id, status) " +
-                     "ON target.post_id = source.post_id AND target.page_id = source.page_id " +
-                     "WHEN NOT MATCHED THEN " +
-                     "  INSERT (post_id, page_id, status) VALUES (source.post_id, source.page_id, source.status) " +
-                     "WHEN MATCHED THEN " +
-                     "  UPDATE SET status = source.status;";
+        // ✅ Sử dụng INSERT ... ON CONFLICT để tránh duplicate key error (PostgreSQL syntax)
+        String sql = "INSERT INTO post_facebook_pages (post_id, page_id, status) VALUES (?, ?, ?) " +
+                     "ON CONFLICT (post_id, page_id) DO UPDATE SET status = EXCLUDED.status";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -37,11 +32,10 @@ public class PostFacebookPageDAO {
                 ps.setInt(1, postId);
                 ps.setString(2, pageId);
                 ps.setString(3, "PENDING");
-                ps.addBatch();
+                ps.executeUpdate(); // Execute each insert individually
             }
             
-            int[] results = ps.executeBatch();
-            System.out.println("PostFacebookPageDAO: Processed " + results.length + " page selections for post " + postId);
+            System.out.println("PostFacebookPageDAO: Processed " + pageIds.size() + " page selections for post " + postId);
         }
     }
     
@@ -49,7 +43,7 @@ public class PostFacebookPageDAO {
      * Cập nhật kết quả đăng Facebook
      */
     public void updatePostResult(int postId, String pageId, String fbPostId, String status, String errorMessage) throws SQLException {
-        String sql = "UPDATE post_facebook_pages SET facebook_post_id = ?, status = ?, error_message = ?, posted_at = GETDATE() " +
+        String sql = "UPDATE post_facebook_pages SET facebook_post_id = ?, status = ?, error_message = ?, posted_at = NOW() " +
                      "WHERE post_id = ? AND page_id = ?";
         
         try (Connection conn = DBContext.getConnection();

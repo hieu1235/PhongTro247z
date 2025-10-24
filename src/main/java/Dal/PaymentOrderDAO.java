@@ -146,7 +146,7 @@ public class PaymentOrderDAO {
      */
     public boolean updatePaymentOrder(PaymentOrder order) {
         String sql = "UPDATE payment_orders SET status = ?, gateway_order_id = ?, gateway_transaction_id = ?, " +
-                    "callback_data = ?, updated_at = GETDATE() WHERE order_id = ?";
+                    "callback_data = ?, updated_at = NOW() WHERE order_id = ?";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -171,7 +171,7 @@ public class PaymentOrderDAO {
      * Lấy danh sách payment orders của user
      */
     public List<PaymentOrder> getOrdersByUserId(int userId, int limit) {
-        String sql = "SELECT TOP (?) * FROM payment_orders WHERE user_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT * FROM payment_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT ?";
         List<PaymentOrder> orders = new ArrayList<>();
         
         try (Connection conn = DBContext.getConnection();
@@ -197,7 +197,7 @@ public class PaymentOrderDAO {
      * Cập nhật status của payment order
      */
     public boolean updateStatus(String orderCode, String status, String gatewayTransactionId) {
-        String sql = "UPDATE payment_orders SET status = ?, gateway_transaction_id = ?, updated_at = GETDATE() " +
+        String sql = "UPDATE payment_orders SET status = ?, gateway_transaction_id = ?, updated_at = NOW() " +
                     "WHERE order_code = ?";
         
         try (Connection conn = DBContext.getConnection();
@@ -222,7 +222,7 @@ public class PaymentOrderDAO {
      */
     public List<PaymentOrder> getExpiredPendingOrders() {
         String sql = "SELECT * FROM payment_orders WHERE status IN ('PENDING', 'PROCESSING') " +
-                    "AND expires_at < GETDATE()"; // Fixed: expires_at thay vì expired_at
+                    "AND expires_at < NOW()"; // Fixed: expires_at thay vì expired_at
         List<PaymentOrder> orders = new ArrayList<>();
         
         try (Connection conn = DBContext.getConnection();
@@ -299,7 +299,7 @@ public class PaymentOrderDAO {
      */
     public boolean updatePaymentStatus(String orderCode, String status, String gatewayTransactionId, String callbackData) {
         String sql = "UPDATE payment_orders SET status = ?, gateway_transaction_id = ?, callback_data = ?, " +
-                    "updated_at = GETDATE() WHERE order_code = ?";
+                    "updated_at = NOW() WHERE order_code = ?";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -324,8 +324,8 @@ public class PaymentOrderDAO {
      */
     public boolean updatePaymentStatusWithPaidAt(String orderCode, String status, String gatewayTransactionId, String callbackData) {
         String sql = "UPDATE payment_orders SET status = ?, gateway_transaction_id = ?, callback_data = ?, " +
-                    "paid_at = CASE WHEN ? = 'SUCCESS' THEN GETDATE() ELSE paid_at END, " +
-                    "updated_at = GETDATE() WHERE order_code = ?";
+                    "paid_at = CASE WHEN ? = 'SUCCESS' THEN NOW() ELSE paid_at END, " +
+                    "updated_at = NOW() WHERE order_code = ?";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -376,8 +376,8 @@ public class PaymentOrderDAO {
      * Lấy successful orders của user
      */
     public List<PaymentOrder> getSuccessfulOrdersByUserId(int userId, int limit) {
-        String sql = "SELECT TOP (?) * FROM payment_orders WHERE user_id = ? AND status = 'SUCCESS' " +
-                    "ORDER BY created_at DESC";
+        String sql = "SELECT * FROM payment_orders WHERE user_id = ? AND status = 'SUCCESS' " +
+                    "ORDER BY created_at DESC LIMIT ?";
         List<PaymentOrder> orders = new ArrayList<>();
         
         try (Connection conn = DBContext.getConnection();
@@ -405,13 +405,12 @@ public class PaymentOrderDAO {
     public List<PaymentOrder> getPendingOrdersInTimeRange(int hours) {
         List<PaymentOrder> orders = new ArrayList<>();
         String sql = "SELECT * FROM payment_orders WHERE status = 'PENDING' " +
-                    "AND created_at >= DATEADD(hour, ?, GETDATE()) " +
+                    "AND created_at >= NOW() + INTERVAL '" + (-hours) + " hours' " +
                     "ORDER BY created_at DESC";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setInt(1, -hours); // Negative hours để lấy thời gian trong quá khứ
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     orders.add(mapResultSetToPaymentOrder(rs));
@@ -461,11 +460,11 @@ public class PaymentOrderDAO {
     public boolean addCoinsToUser(int userId, double coins, String orderCode) {
         String checkBalanceSql = "SELECT balance_id FROM user_balance WHERE user_id = ?";
         String insertBalanceSql = "INSERT INTO user_balance (user_id, total_coins, spent_coins, available_coins, created_at, updated_at) " +
-                                "VALUES (?, ?, 0, ?, GETDATE(), GETDATE())";
+                                "VALUES (?, ?, 0, ?, NOW(), NOW())";
         String updateBalanceSql = "UPDATE user_balance SET " +
                                 "total_coins = total_coins + ?, " +
                                 "available_coins = available_coins + ?, " +
-                                "updated_at = GETDATE() " +
+                                "updated_at = NOW() " +
                                 "WHERE user_id = ?";
         
         try (Connection conn = DBContext.getConnection()) {

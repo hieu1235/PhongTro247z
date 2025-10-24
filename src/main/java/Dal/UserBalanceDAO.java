@@ -96,7 +96,7 @@ public class UserBalanceDAO {
      */
     public boolean update(UserBalance balance) {
         String sql = "UPDATE user_balance SET total_coins = ?, spent_coins = ?, available_coins = ?, " +
-                    "updated_at = GETDATE() WHERE balance_id = ?";
+                    "updated_at = NOW() WHERE balance_id = ?";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -121,7 +121,7 @@ public class UserBalanceDAO {
      */
     public boolean updateByUserId(UserBalance balance) {
         String sql = "UPDATE user_balance SET total_coins = ?, spent_coins = ?, available_coins = ?, " +
-                    "updated_at = GETDATE() WHERE user_id = ?";
+                    "updated_at = NOW() WHERE user_id = ?";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -148,7 +148,7 @@ public class UserBalanceDAO {
         String sql = "UPDATE user_balance SET " +
                     "total_coins = total_coins + ?, " +
                     "available_coins = available_coins + ?, " +
-                    "updated_at = GETDATE() " +
+                    "updated_at = NOW() " +
                     "WHERE user_id = ?";
         
         try (Connection conn = DBContext.getConnection();
@@ -175,7 +175,7 @@ public class UserBalanceDAO {
         String sql = "UPDATE user_balance SET " +
                     "spent_coins = spent_coins + ?, " +
                     "available_coins = available_coins - ?, " +
-                    "updated_at = GETDATE() " +
+                    "updated_at = NOW() " +
                     "WHERE user_id = ? AND available_coins >= ?";
         
         try (Connection conn = DBContext.getConnection();
