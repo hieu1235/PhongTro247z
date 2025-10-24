@@ -94,16 +94,16 @@
         </div>
 
         <nav class="nav flex-column px-2">
-            <a class="nav-link" href="/PhongTroNew/admin/dashboard">
+            <a class="nav-link" href="/admin/dashboard">
                 <i class="fas fa-tachometer-alt me-2"></i>Dashboard
             </a>
-            <a class="nav-link" href="/PhongTroNew/admin/posts">
+            <a class="nav-link" href="/admin/posts">
                 <i class="fas fa-newspaper me-2"></i>Quản lý bài đăng
             </a>
-            <a class="nav-link active" href="/PhongTroNew/admin/users">
+            <a class="nav-link active" href="/admin/users">
                 <i class="fas fa-users me-2"></i>Quản lý người dùng
             </a>
-            <a class="nav-link" href="/PhongTroNew/admin/payments">
+            <a class="nav-link" href="/admin/payments">
                 <i class="fas fa-credit-card me-2"></i>Quản lý thanh toán
             </a>
             <hr class="text-white-50">
@@ -111,7 +111,7 @@
                 <small class="text-white-50 d-block">Đăng nhập với:</small>
                 <small class="text-white fw-bold"><%= currentUser.getFullName() %></small>
             </div>
-            <a class="nav-link" href="/PhongTroNew/logout">
+            <a class="nav-link" href="/logout">
                 <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
             </a>
         </nav>

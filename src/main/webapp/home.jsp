@@ -1300,7 +1300,7 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <a href="/PhongTroNew/" class="logo">
+                <a href="/" class="logo">
                     <i class="fas fa-home"></i>
                     PhongTro247
                 </a>
@@ -1308,25 +1308,25 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <nav class="nav-links" id="navLinks">
-                    <a href="/PhongTroNew/">
+                    <a href="/">
                         <i class="fas fa-search"></i> Tìm phòng
                     </a>
                     <c:if test="${sessionScope.user == null}">
-                        <a href="/PhongTroNew/login">
+                        <a href="/login">
                             <i class="fas fa-sign-in-alt"></i> Đăng nhập
                         </a>
-                        <a href="/PhongTroNew/register">
+                        <a href="/register">
                             <i class="fas fa-user-plus"></i> Đăng ký
                         </a>
                     </c:if>
                     <c:if test="${sessionScope.user != null}">
-                        <a href="/PhongTroNew/post/my">
+                        <a href="/post/my">
                             <i class="fas fa-list"></i> Tin của tôi
                         </a>
-                        <a href="/PhongTroNew/post/create">
+                        <a href="/post/create">
                             <i class="fas fa-plus"></i> Đăng tin
                         </a>
-                        <a href="/PhongTroNew/logout">
+                        <a href="/logout">
                             <i class="fas fa-sign-out-alt"></i> Đăng xuất
                         </a>
                     </c:if>

@@ -383,7 +383,7 @@
                     <a class="active" href="${pageContext.request.contextPath}/facebook/manage"><i class="fab fa-facebook"></i><span>Cấu hình Facebook</span></a>
                     <a href="${pageContext.request.contextPath}/"><i class="fas fa-home"></i><span>Xem trang chủ</span></a>
                     <a href="${pageContext.request.contextPath}/profile"><i class="fas fa-user-cog"></i><span>Cài đặt tài khoản</span></a>
-                    <a href="/PhongTroNew/logout" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')" class="logout"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a>
+                    <a href="/logout" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')" class="logout"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a>
                 </div>
             </nav>
 
