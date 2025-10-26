@@ -1056,6 +1056,102 @@
                 margin: 0;
             }
 
+            /* New Footer Styles */
+            .footer-stats {
+                display: flex;
+                gap: 2rem;
+                margin-top: 1.5rem;
+            }
+
+            .footer-stats .stat-item {
+                text-align: center;
+            }
+
+            .footer-stats .stat-number {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #ffd700;
+                display: block;
+            }
+
+            .footer-stats .stat-label {
+                font-size: 0.8rem;
+                color: #a0aec0;
+            }
+
+            .legal-links {
+                display: flex;
+                gap: 1rem;
+                margin-top: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .legal-link {
+                color: #cbd5e0;
+                text-decoration: none;
+                font-size: 0.85rem;
+                transition: color 0.3s ease;
+            }
+
+            .legal-link:hover {
+                color: #ffd700;
+                text-decoration: underline;
+            }
+
+            .footer-bottom-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .copyright {
+                flex: 1;
+                text-align: left;
+            }
+
+            .copyright p {
+                margin: 0.2rem 0;
+                font-size: 0.85rem;
+            }
+
+            .footer-badges {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .badge {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background: rgba(255, 215, 0, 0.1);
+                color: #ffd700;
+                padding: 0.4rem 0.8rem;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                border: 1px solid rgba(255, 215, 0, 0.2);
+            }
+
+            .badge i {
+                font-size: 0.9rem;
+            }
+
+            .footer-disclaimer {
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+                padding-top: 1rem;
+                margin-top: 1rem;
+            }
+
+            .footer-disclaimer p {
+                margin: 0;
+                font-size: 0.8rem;
+                color: #718096;
+                line-height: 1.4;
+            }
+
             /* Footer Responsive */
             @media (max-width: 1024px) {
                 .footer-content {
@@ -1633,87 +1729,100 @@
             <footer class="footer">
                 <div class="container">
                     <div class="footer-content">
-                        <!-- About Us Section -->
+                        <!-- Company Info Section -->
                         <div class="footer-section footer-about">
                             <div class="brand">
                                 <i class="fas fa-home"></i> PhongTro247
                             </div>
-                            <p>Nền tảng tìm kiếm phòng trọ hàng đầu Việt Nam. Chúng tôi kết nối người tìm phòng với chủ nhà một cách nhanh chóng, an toàn và minh bạch.</p>
-
-
+                            <p>PhongTro247 - Nền tảng tìm kiếm phòng trọ uy tín hàng đầu Việt Nam. Chúng tôi cam kết mang đến trải nghiệm thuê phòng trọ an toàn, minh bạch và tiện lợi cho hàng nghìn người dùng trên toàn quốc.</p>
+                            <div class="footer-stats">
+                                <div class="stat-item">
+                                    <span class="stat-number">10,000+</span>
+                                    <span class="stat-label">Phòng trọ</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">50,000+</span>
+                                    <span class="stat-label">Người dùng</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">63</span>
+                                    <span class="stat-label">Tỉnh thành</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Quick Links Section -->
+                        <!-- Services Section -->
                         <div class="footer-section">
-                            <h4>Liên kết nhanh</h4>
+                            <h4>Dịch vụ</h4>
                             <div class="footer-links">
                                 <a href="${pageContext.request.contextPath}/" class="footer-link">
                                     <i class="fas fa-search"></i>
                                     Tìm phòng trọ
                                 </a>
                                 <a href="${pageContext.request.contextPath}/post/create" class="footer-link">
-                                    <i class="fas fa-plus"></i>
+                                    <i class="fas fa-plus-circle"></i>
                                     Đăng tin cho thuê
                                 </a>
                                 <a href="${pageContext.request.contextPath}/my-posts" class="footer-link">
-                                    <i class="fas fa-list"></i>
+                                    <i class="fas fa-list-alt"></i>
                                     Quản lý tin đăng
                                 </a>
-                                <a href="${pageContext.request.contextPath}/" class="footer-link">
-                                    <i class="fas fa-info-circle"></i>
-                                    Về chúng tôi
+                                <a href="${pageContext.request.contextPath}/subscription" class="footer-link">
+                                    <i class="fas fa-crown"></i>
+                                    Gói dịch vụ
                                 </a>
-                                <a href="${pageContext.request.contextPath}/" class="footer-link">
-                                    <i class="fas fa-file-contract"></i>
-                                    Điều khoản sử dụng
+                                <a href="${pageContext.request.contextPath}/verification" class="footer-link">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Xác minh tài khoản
                                 </a>
                             </div>
                         </div>
 
-                        <!-- Services Section -->
+                        <!-- Support Section -->
                         <div class="footer-section">
-                            <h4>Dịch vụ (cập nhật sớm)</h4>
-                            <div class="footer-services">
-                                <div class="service-item">
-                                    <i class="fas fa-home"></i>
-                                    Cho thuê phòng trọ
-                                </div>
-                                <div class="service-item">
-                                    <i class="fas fa-building"></i>
-                                    Cho thuê căn hộ
-                                </div>
-                                <div class="service-item">
-                                    <i class="fas fa-house-user"></i>
-                                    Cho thuê nhà nguyên căn
-                                </div>
-                                <div class="service-item">
-                                    <i class="fas fa-bed"></i>
-                                    Tìm người ở ghép
-                                </div>
-                                <div class="service-item">
-                                    <i class="fas fa-headset"></i>
-                                    Hỗ trợ 24/7
-                                </div>
+                            <h4>Hỗ trợ</h4>
+                            <div class="footer-links">
+                                <a href="${pageContext.request.contextPath}/help" class="footer-link">
+                                    <i class="fas fa-question-circle"></i>
+                                    Trung tâm trợ giúp
+                                </a>
+                                <a href="${pageContext.request.contextPath}/contact" class="footer-link">
+                                    <i class="fas fa-envelope"></i>
+                                    Liên hệ chúng tôi
+                                </a>
+                                <a href="${pageContext.request.contextPath}/feedback" class="footer-link">
+                                    <i class="fas fa-comment"></i>
+                                    Gửi phản hồi
+                                </a>
+                                <a href="${pageContext.request.contextPath}/report" class="footer-link">
+                                    <i class="fas fa-flag"></i>
+                                    Báo cáo vi phạm
+                                </a>
+                                <a href="${pageContext.request.contextPath}/faq" class="footer-link">
+                                    <i class="fas fa-info-circle"></i>
+                                    Câu hỏi thường gặp
+                                </a>
                             </div>
                         </div>
 
-                        <!-- Contact Section -->
+                        <!-- Contact & Legal Section -->
                         <div class="footer-section footer-contact">
-                            <h4>Liên hệ</h4>
-
-                            <div class="contact-item">
-                                <i class="fas fa-envelope"></i>
-                                <div>
-                                    <strong>Email:</strong><br>
-                                    support@phongtro247.com
-                                </div>
-                            </div>
+                            <h4>Liên hệ & Pháp lý</h4>
 
                             <div class="contact-item">
                                 <i class="fas fa-phone"></i>
                                 <div>
                                     <strong>Hotline:</strong><br>
-                                    1900 1234 (8:00 - 22:00)
+                                    <a href="tel:19001234" style="color: inherit; text-decoration: none;">1900 1234</a><br>
+                                    <small>(8:00 - 22:00 hàng ngày)</small>
+                                </div>
+                            </div>
+
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <strong>Email:</strong><br>
+                                    <a href="mailto:support@phongtro247.com" style="color: inherit; text-decoration: none;">support@phongtro247.com</a>
                                 </div>
                             </div>
 
@@ -1721,24 +1830,32 @@
                                 <i class="fas fa-map-marker-alt"></i>
                                 <div>
                                     <strong>Địa chỉ:</strong><br>
+                                    Tầng 5, Tòa nhà ABC<br>
+                                    123 Đường XYZ, Quận 1<br>
                                     TP.HCM, Việt Nam
                                 </div>
                             </div>
 
+                            <div class="legal-links">
+                                <a href="${pageContext.request.contextPath}/terms" class="legal-link">Điều khoản sử dụng</a>
+                                <a href="${pageContext.request.contextPath}/privacy" class="legal-link">Bảo mật thông tin</a>
+                                <a href="${pageContext.request.contextPath}/cookies" class="legal-link">Cookie</a>
+                            </div>
+
                             <div class="social-links">
-                                <a href="#" title="Facebook" aria-label="Facebook">
+                                <a href="https://facebook.com/phongtro247" title="Facebook" aria-label="Facebook" target="_blank">
                                     <i class="fab fa-facebook-f"></i>
                                 </a>
-                                <a href="#" title="Zalo" aria-label="Zalo">
+                                <a href="https://zalo.me/123456789" title="Zalo" aria-label="Zalo" target="_blank">
                                     <i class="fas fa-comment-dots"></i>
                                 </a>
-                                <a href="#" title="YouTube" aria-label="YouTube">
+                                <a href="https://youtube.com/@phongtro247" title="YouTube" aria-label="YouTube" target="_blank">
                                     <i class="fab fa-youtube"></i>
                                 </a>
-                                <a href="#" title="Instagram" aria-label="Instagram">
+                                <a href="https://instagram.com/phongtro247" title="Instagram" aria-label="Instagram" target="_blank">
                                     <i class="fab fa-instagram"></i>
                                 </a>
-                                <a href="#" title="TikTok" aria-label="TikTok">
+                                <a href="https://tiktok.com/@phongtro247" title="TikTok" aria-label="TikTok" target="_blank">
                                     <i class="fab fa-tiktok"></i>
                                 </a>
                             </div>
@@ -1746,7 +1863,25 @@
                     </div>
 
                     <div class="footer-bottom">
-                        <p>&copy; 2024 PhongTro247. Tất cả quyền được bảo lưu. | Made with ❤️ in Vietnam | Thiết kế bởi PhongTro247 Team</p>
+                        <div class="footer-bottom-content">
+                            <div class="copyright">
+                                <p>&copy; 2024 PhongTro247. Tất cả quyền được bảo lưu.</p>
+                                <p>Giấy phép kinh doanh: 0123456789 - Cấp ngày 01/01/2024 bởi Sở KHĐT TP.HCM</p>
+                            </div>
+                            <div class="footer-badges">
+                                <span class="badge">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Bảo mật SSL 256-bit
+                                </span>
+                                <span class="badge">
+                                    <i class="fas fa-lock"></i>
+                                    Dữ liệu được mã hóa
+                                </span>
+                            </div>
+                        </div>
+                        <div class="footer-disclaimer">
+                            <p><small>PhongTro247 không chịu trách nhiệm về tính chính xác của thông tin được đăng tải bởi người dùng. Người dùng tự chịu trách nhiệm về các giao dịch của mình.</small></p>
+                        </div>
                     </div>
                 </div>
             </footer>
