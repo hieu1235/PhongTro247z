@@ -20,6 +20,14 @@
                 box-sizing: border-box;
             }
 
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
             body {
                 font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
                 line-height: 1.6;
@@ -28,6 +36,16 @@
                 min-height: 100vh;
                 margin: 0;
                 padding: 0;
+            }
+
+            .container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                max-width: 1800px;
+                margin: 0 auto;
+                padding: 0 1rem;
             }
 
             /* Header Styles - Professional */
@@ -128,11 +146,7 @@
             }
 
             /* Container */
-            .container {
-                max-width: 1800px;
-                margin: 0 auto;
-                padding: 0 1rem;
-            }
+            /* Container styles moved to top */
 
             /* Main Layout - Horizontal Search + Map Below */
             .main-layout {
@@ -140,8 +154,7 @@
                 flex-direction: column;
                 gap: 2rem;
                 margin-top: 2rem;
-                margin-bottom: 3rem;
-                min-height: calc(100vh - 200px);
+                flex: 1;
             }
 
             .search-panel {
@@ -837,8 +850,10 @@
                 background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #4a5568 100%);
                 color: white;
                 padding: 4rem 0 2rem 0;
-                margin-top: 4rem;
+                margin-top: 0;
                 position: relative;
+                width: 100%;
+                clear: both;
             }
 
             .footer::before {
@@ -1625,20 +1640,7 @@
                             </div>
                             <p>Nền tảng tìm kiếm phòng trọ hàng đầu Việt Nam. Chúng tôi kết nối người tìm phòng với chủ nhà một cách nhanh chóng, an toàn và minh bạch.</p>
 
-                            <div class="stats">
-                                <div class="stat-item">
-                                    <span class="stat-number">10K+</span>
-                                    <span class="stat-label">Phòng trọ</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-number">5K+</span>
-                                    <span class="stat-label">Khách hàng</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-number">100+</span>
-                                    <span class="stat-label">Quận/Huyện</span>
-                                </div>
-                            </div>
+
                         </div>
 
                         <!-- Quick Links Section -->
@@ -1657,11 +1659,11 @@
                                     <i class="fas fa-list"></i>
                                     Quản lý tin đăng
                                 </a>
-                                <a href="${pageContext.request.contextPath}/about" class="footer-link">
+                                <a href="${pageContext.request.contextPath}/" class="footer-link">
                                     <i class="fas fa-info-circle"></i>
                                     Về chúng tôi
                                 </a>
-                                <a href="${pageContext.request.contextPath}/terms" class="footer-link">
+                                <a href="${pageContext.request.contextPath}/" class="footer-link">
                                     <i class="fas fa-file-contract"></i>
                                     Điều khoản sử dụng
                                 </a>
@@ -1670,7 +1672,7 @@
 
                         <!-- Services Section -->
                         <div class="footer-section">
-                            <h4>Dịch vụ</h4>
+                            <h4>Dịch vụ (cập nhật sớm)</h4>
                             <div class="footer-services">
                                 <div class="service-item">
                                     <i class="fas fa-home"></i>
@@ -1843,7 +1845,7 @@
                                     <strong>Diện tích:</strong> ${m.area} m²
                                 </p>
                                 <p style="margin: 0 0 8px 0; color: #e53e3e; font-size: 16px; font-weight: bold;">
-                ${m.price} VNĐ
+                                    ${m.price} VNĐ
                                 </p>
                                 <a href="${m.url}" style="display: inline-block; background: #667eea; color: white; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-size: 14px;">
                                     Xem chi tiết
@@ -1878,7 +1880,7 @@
                                     <circle cx="20" cy="20" r="16" fill="${color}" stroke="white" stroke-width="3"/>
                                     <text x="20" y="25" text-anchor="middle" fill="white" 
                                           font-family="Arial, sans-serif" font-size="12" font-weight="bold">
-                ${cluster.count}
+                                        ${cluster.count}
                                     </text>
                                 </svg>
                             `;
