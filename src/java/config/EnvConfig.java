@@ -31,6 +31,14 @@ public class EnvConfig {
      * @return Chuỗi JDBC URL hoàn chỉnh.
      */
     public static String buildDatabaseUrl() {
+        // Ưu tiên sử dụng DB_URL trực tiếp nếu có
+        String directUrl = get("DB_URL");
+        if (directUrl != null && !directUrl.isEmpty()) {
+            System.out.println("✅ Using direct DB_URL from environment");
+            return directUrl;
+        }
+
+        // Fallback: xây dựng từ các phần riêng lẻ
         String host = get("DB_HOST");
         String port = get("DB_PORT");
         String dbName = get("DB_NAME");

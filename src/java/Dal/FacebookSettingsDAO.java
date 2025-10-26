@@ -27,7 +27,7 @@ public class FacebookSettingsDAO {
      * Lấy Page mặc định của user
      */
     public FacebookSettings getDefaultPage(int userId) throws SQLException {
-        String sql = "SELECT * FROM facebook_settings WHERE user_id = ? AND is_default = 1 AND is_active = 1";
+        String sql = "SELECT * FROM facebook_settings WHERE user_id = ? AND is_default = 1 AND (is_active = true OR is_active IS NULL)";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -49,7 +49,7 @@ public class FacebookSettingsDAO {
     public List<FacebookSettings> getAllActivePages(int userId) throws SQLException {
         System.out.println("DEBUG: FacebookSettingsDAO.getAllActivePages called for userId=" + userId);
         List<FacebookSettings> pages = new ArrayList<>();
-        String sql = "SELECT * FROM facebook_settings WHERE user_id = ? AND is_active = 1 " +
+        String sql = "SELECT * FROM facebook_settings WHERE user_id = ? AND (is_active = true OR is_active IS NULL) " +
                     "ORDER BY is_default DESC, page_name ASC";
         
         System.out.println("DEBUG: Executing SQL: " + sql + " with userId=" + userId);
@@ -62,15 +62,26 @@ public class FacebookSettingsDAO {
             
             int count = 0;
             while (rs.next()) {
-                FacebookSettings page = mapRowToFacebookSettings(rs);
-                pages.add(page);
                 count++;
-                System.out.println("DEBUG: Found page " + count + ": " + page.getPageName() + 
-                                  " (ID: " + page.getPageId() + ", Active: " + page.isActive() + 
-                                  ", AutoPost: " + page.isAutoPost() + ", Default: " + page.isDefault() + ")");
+                System.out.println("DEBUG: Processing row " + count);
+                try {
+                    FacebookSettings page = mapRowToFacebookSettings(rs);
+                    pages.add(page);
+                    System.out.println("DEBUG: Successfully mapped page " + count + ": " + page.getPageName() + 
+                                      " (ID: " + page.getPageId() + ", Active: " + page.isActive() + 
+                                      ", AutoPost: " + page.isAutoPost() + ", Default: " + page.isDefault() + ")");
+                } catch (Exception e) {
+                    System.out.println("ERROR: Failed to map row " + count + ": " + e.getMessage());
+                    e.printStackTrace();
+                    // Continue with next row
+                }
             }
             
-            System.out.println("DEBUG: Total pages found: " + pages.size());
+            System.out.println("DEBUG: Total pages found and mapped: " + pages.size());
+        } catch (SQLException e) {
+            System.out.println("ERROR: SQLException in getAllActivePages: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
         
         return pages;
@@ -80,7 +91,7 @@ public class FacebookSettingsDAO {
      * Lấy Page theo ID cụ thể
      */
     public FacebookSettings getPageById(int userId, String pageId) throws SQLException {
-        String sql = "SELECT * FROM facebook_settings WHERE user_id = ? AND page_id = ? AND is_active = 1";
+        String sql = "SELECT * FROM facebook_settings WHERE user_id = ? AND page_id = ? AND (is_active = true OR is_active IS NULL)";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -195,6 +206,7 @@ public class FacebookSettingsDAO {
      * Thêm Facebook Page mới
      */
     public void insert(FacebookSettings settings) throws SQLException {
+        System.out.println("DEBUG: FacebookSettingsDAO.insert() called for pageId=" + settings.getPageId());
         Connection conn = null;
         try {
             conn = DBContext.getConnection();
@@ -202,16 +214,19 @@ public class FacebookSettingsDAO {
             
             // Nếu page mới được set làm default, reset tất cả pages khác
             if (settings.isDefault()) {
+                System.out.println("DEBUG: Setting page as default, resetting other pages");
                 String resetSql = "UPDATE facebook_settings SET is_default = 0 WHERE user_id = ?";
                 try (PreparedStatement ps = conn.prepareStatement(resetSql)) {
                     ps.setInt(1, settings.getUserId());
-                    ps.executeUpdate();
+                    int resetCount = ps.executeUpdate();
+                    System.out.println("DEBUG: Reset " + resetCount + " pages to non-default");
                 }
             }
             
             // Insert page mới
             String sql = "INSERT INTO facebook_settings (page_id, page_name, access_token, user_id, " +
                         "is_active, auto_post, is_default) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            System.out.println("DEBUG: Executing INSERT SQL: " + sql);
         
             try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 
@@ -227,22 +242,38 @@ public class FacebookSettingsDAO {
                 ps.setBoolean(6, settings.isAutoPost());
                 ps.setBoolean(7, settings.isDefault());
                 
+                System.out.println("DEBUG: Setting parameters - pageId: " + settings.getPageId() + 
+                                  ", pageName: " + settings.getPageName() + 
+                                  ", userId: " + settings.getUserId() + 
+                                  ", isActive: " + settings.isActive() + 
+                                  ", isAutoPost: " + settings.isAutoPost() + 
+                                  ", isDefault: " + settings.isDefault());
+                
                 int rowsAffected = ps.executeUpdate();
+                System.out.println("DEBUG: INSERT executed, rowsAffected=" + rowsAffected);
                 
                 if (rowsAffected > 0) {
                     ResultSet rs = ps.getGeneratedKeys();
                     if (rs.next()) {
-                        settings.setSettingId(rs.getInt(1));
+                        int generatedId = rs.getInt(1);
+                        settings.setSettingId(generatedId);
+                        System.out.println("DEBUG: Generated settingId=" + generatedId);
                     }
+                } else {
+                    System.out.println("WARNING: INSERT did not affect any rows!");
                 }
             }
             
             conn.commit();
+            System.out.println("DEBUG: Transaction committed successfully");
             
         } catch (SQLException e) {
+            System.out.println("ERROR: Exception in insert(): " + e.getMessage());
+            e.printStackTrace();
             if (conn != null) {
                 try {
                     conn.rollback();
+                    System.out.println("DEBUG: Transaction rolled back");
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
@@ -258,6 +289,7 @@ public class FacebookSettingsDAO {
                 }
             }
         }
+        System.out.println("DEBUG: FacebookSettingsDAO.insert() completed");
     }
     
     /**
@@ -360,7 +392,7 @@ public class FacebookSettingsDAO {
      * Đếm số lượng active pages của user
      */
     public int countActivePages(int userId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM facebook_settings WHERE user_id = ? AND is_active = 1";
+        String sql = "SELECT COUNT(*) FROM facebook_settings WHERE user_id = ? AND (is_active = true OR is_active IS NULL)";
         
         try (Connection conn = DBContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -380,7 +412,7 @@ public class FacebookSettingsDAO {
      * Helper: Lấy page active đầu tiên
      */
     private FacebookSettings getFirstActivePage(int userId) throws SQLException {
-        String sql = "SELECT TOP 1 * FROM facebook_settings WHERE user_id = ? AND is_active = 1 " +
+        String sql = "SELECT TOP 1 * FROM facebook_settings WHERE user_id = ? AND (is_active = true OR is_active IS NULL) " +
                     "ORDER BY created_at ASC";
         
         try (Connection conn = DBContext.getConnection();
@@ -401,28 +433,41 @@ public class FacebookSettingsDAO {
      * Map ResultSet to FacebookSettings
      */
     private FacebookSettings mapRowToFacebookSettings(ResultSet rs) throws SQLException {
-        FacebookSettings settings = new FacebookSettings();
-        settings.setSettingId(rs.getInt("setting_id"));
-        settings.setPageId(rs.getString("page_id"));
-        settings.setPageName(rs.getString("page_name"));
-        
-        // ✅ Giải mã access token khi đọc từ database
-        String encryptedToken = rs.getString("access_token");
-        String decryptedToken = TokenEncryptionUtil.decrypt(encryptedToken);
-        settings.setAccessToken(decryptedToken);
-        
-        settings.setUserId(rs.getInt("user_id"));
-        settings.setActive(rs.getBoolean("is_active"));
-        settings.setAutoPost(rs.getBoolean("auto_post"));
-        
         try {
-            settings.setDefault(rs.getBoolean("is_default"));
-        } catch (SQLException e) {
-            settings.setDefault(false);
+            FacebookSettings settings = new FacebookSettings();
+            settings.setSettingId(rs.getInt("setting_id"));
+            settings.setPageId(rs.getString("page_id"));
+            settings.setPageName(rs.getString("page_name"));
+            
+            // ✅ Giải mã access token khi đọc từ database
+            String encryptedToken = rs.getString("access_token");
+            System.out.println("DEBUG: Decrypting token for page " + rs.getString("page_id"));
+            String decryptedToken = TokenEncryptionUtil.decrypt(encryptedToken);
+            settings.setAccessToken(decryptedToken);
+            
+            settings.setUserId(rs.getInt("user_id"));
+            
+            // Handle boolean columns that might be NULL
+            settings.setActive(rs.getObject("is_active") != null ? rs.getBoolean("is_active") : true);
+            settings.setAutoPost(rs.getObject("auto_post") != null ? rs.getBoolean("auto_post") : false);
+            
+            // Handle is_default that might not exist in older databases
+            try {
+                settings.setDefault(rs.getObject("is_default") != null ? rs.getBoolean("is_default") : false);
+            } catch (SQLException e) {
+                System.out.println("DEBUG: is_default column not found, setting to false");
+                settings.setDefault(false);
+            }
+            
+            settings.setCreatedAt(rs.getTimestamp("created_at"));
+            settings.setUpdatedAt(rs.getTimestamp("updated_at"));
+            
+            System.out.println("DEBUG: Successfully mapped FacebookSettings for page " + settings.getPageName());
+            return settings;
+        } catch (Exception e) {
+            System.out.println("ERROR: Failed to map ResultSet to FacebookSettings: " + e.getMessage());
+            e.printStackTrace();
+            throw new SQLException("Failed to map database row to FacebookSettings object", e);
         }
-        
-        settings.setCreatedAt(rs.getTimestamp("created_at"));
-        settings.setUpdatedAt(rs.getTimestamp("updated_at"));
-        return settings;
     }
 }
