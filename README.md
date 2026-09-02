@@ -142,7 +142,7 @@ PhongTro247z/
 ## 📄 License
 
 Dự án này sử dụng giấy phép MIT. Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
-![Uploading {0260203D-4EED-42D9-A0F4-323740B4FFB0}.png…]()
+
 
 ---
 
